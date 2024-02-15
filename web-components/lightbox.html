@@ -1,0 +1,101 @@
+<template id="centered-lightbox-v2">
+  <style>
+    :host {
+      position: fixed;
+    }
+    .window {
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      bottom:0;
+      visibility: visible;
+      opacity: 1;
+      display: grid;
+  	  margin:0 auto;
+  	  max-width:544px;
+      align-items: center;
+      transition: 0.25s
+    }
+    .window.hide {
+      visibility: hidden;
+      opacity: 0;
+    }
+    .window .modal {
+      transition: 0.25s;
+      transform: scale(1);
+      display: grid;
+  		grid-template-rows: auto 1fr auto;
+  		margin: 0 16px;
+  		position: relative;
+  		overflow: hidden;
+    }
+    .window.hide .modal {
+      transform: scale(0.95);
+    	visibility: hidden;;
+    }
+  	.window .overlay{
+      background: #000000aa;
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+  	}
+    slot {
+      display: block;
+    }
+  </style>
+  
+  [ .window .hide
+    [ .overlay]
+    [ .modal
+      [slot name="content"]
+    ]
+  ]
+</template>
+
+<script>
+  (function() {
+    let $ = (selector, node = document) => node.querySelectorAll(selector);
+    let version = 2;
+    let templateId = `centered-lightbox-v${version}`;
+    class CustomElement extends HTMLElement {
+      constructor() {
+        super();
+         /* production-script
+        let template = document.createElement('template');
+        template.setAttribute('id', templateId);
+        template.innerHTML = "@replaceWithTemplateHTML@";
+        document.querySelector('html').append(template);
+        // */
+        let content = $(`template#${templateId}`)[0].content.cloneNode(true);
+        this.attachShadow({mode: 'open'}).append(content);
+        $('slot', this.shadowRoot)[0].addEventListener('slotchange', this.updateContent.bind(this));
+        this.onclose = new CustomEvent('onclose');
+      }
+      
+      toggle() {
+        let isClosed = $('.window', this.shadowRoot)[0].classList.toggle('hide');
+        if (isClosed)
+          this.dispatchEvent(this.onclose);
+        return !isClosed;
+      }
+      
+      connectedCallback() {
+        $('.overlay', this.shadowRoot)[0].addEventListener('click', this.toggle.bind(this));
+      }
+      
+      getSlotData(evt) {
+        return evt.target.assignedNodes()[0];
+      }
+      
+      updateContent(evt) {
+        let contentDOM = this.getSlotData(evt)
+        for (let node of $('.toggler', contentDOM))
+          node.addEventListener('click', this.toggle.bind(this));
+      }
+    }
+    customElements.define(templateId, CustomElement);
+  })();
+</script>

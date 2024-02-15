@@ -1,0 +1,254 @@
+<template id="drag-window-v1">
+  <style>
+    .window {
+      box-shadow: 0px 0px 4px 0px #000000;
+      border-radius: 3px;
+      border-color: white!important;
+      overflow: hidden;
+      border-radius: 3px;
+    }
+    .no-select {  
+      user-select: none;          /* Likely future */   
+      -moz-user-select: none;     /* Firefox 43+ */
+      -ms-user-select: none;      /* No support yet */
+      -webkit-user-select: none;  /* Chrome 49+ */
+    }
+    .blocker {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0,0,0,0.1);
+      height: 100%;
+    }
+    .title-wrap{background:black}
+    .title-wrap.isDrag{background:#393e46;cursor:move}
+    .title-wrap.isDrag ~ div > .blocker {
+      display: block;
+    }
+    .closer {
+      display: block;
+      padding: 0 4px;
+      border-radius: 50%;
+    }
+    .closer:hover {
+      background: yellow;
+      color: black;
+    }
+    slot:not(.custom-size) {
+      min-width: 200px;
+      min-height: 200px;
+    }
+    slot:not(.no-resize) {
+      resize: both;
+    }
+  </style>
+  [ .window {d:inline-block} {bor:1px solid} {pos:fixed}
+    [ .title-wrap {p:.5rem .75rem} {ff:sans-serif} {col:white} {fs:.8rem} .no-select {d:flex}
+      [s "Image Reference" .title]
+      [s "&times;" {ml:auto} {cursor:pointer} .closer]
+    ]
+    [ {pos:relative}
+      [slot {d:block} name="content" .M   {ov:hidden}]
+      [ .blocker]
+    ]
+  ]
+</template>
+
+<script> L = console.log </script>
+<script>
+  (function() {
+    let $ = (selector, node = document) => node.querySelectorAll(selector);
+    let version = 1;
+    let templateId = `drag-window-v${version}`;
+    class CustomElement extends HTMLElement {
+      constructor() {
+        super();
+        let content = $(`template#${templateId}`)[0].content.cloneNode(true);
+        this.attachShadow({mode: 'open'}).append(content);
+        this.w = 300;
+        this.h = 300;
+        this.x = 0;
+        this.y = 0;
+        this.posX = 50;
+        this.posY = 50;
+        this.onclose = new CustomEvent('onclose');
+      }
+      
+      connectedCallback() {
+        let node = $('.M',this.shadowRoot)[0]
+        if (this.hasAttribute('width')) {
+          this.w = parseInt(this.getAttribute('width'));
+        } 
+        if (this.hasAttribute('height')) {
+          this.h = parseInt(this.getAttribute('height'));
+        }
+        
+        node.style.width = this.w + 'px';
+        node.style.height = this.h + 'px'
+        
+        node = $('.title-wrap',this.shadowRoot)[0]
+        node.addEventListener('mousedown',this.go.bind(this))
+        node.addEventListener('touchstart',this.go.bind(this))
+        // node.addEventListener('drag',this.go2.bind(this))
+        // node.addEventListener('dragend',this.go2.bind(this))
+        $('.closer',this.shadowRoot)[0].addEventListener('click', this.close.bind(this))
+
+        node = $('.window',this.shadowRoot)[0]
+        node.style.left = this.posX + 'px'
+        node.style.top = this.posY + 'px'
+        $('.window',this.shadowRoot)[0].addEventListener('mousedown', this.bringToFront.bind(this));
+        
+        if (this.hasAttribute('title'))
+          $('.title',this.shadowRoot)[0].textContent = this.title;
+        if (this.hasAttribute('no-resize'))
+          $('slot',this.shadowRoot)[0].classList.toggle('no-resize', true);
+        $('slot',this.shadowRoot)[0].classList.toggle('custom-size', this.hasAttribute('custom-size'));
+        this.bringToFront()
+      }
+      
+      close(isDispatchEvent = true) {
+        if (this.getAttribute('preview') !== null) {
+          ui.window.togglePreview(false);
+          // app.settings.data.window.preview = false;
+        } else if (this.getAttribute('reference') !== null) {
+          this.classList.add('hide');
+          app.settings.data.windows.reference.isShown = false;
+          app.settings.save();
+        } else {
+          this.classList.add('hide');
+        }
+        if (isDispatchEvent) {
+          this.dispatchEvent(this.onclose);
+        }
+      }
+      
+      go(event) {
+        if (event.target.classList.contains('closer'))
+          return;
+        if (this.skipMousedown && !event.changedTouches)
+          return
+        
+        if (this.isDragging) {
+          this.end();
+        } else {
+          if (event.changedTouches) {
+            window.clearTimeout(this.touchTimeout);
+            event.preventDefault();
+            this.touchTimeout = setTimeout(() => {
+              this.skipMousedown = false;
+            }, 100)
+            event = event.changedTouches[0];
+            this.skipMousedown = true;
+          }
+          $('.title-wrap',this.shadowRoot)[0].classList.add('isDrag')
+          this.x = event.screenX;
+          this.y = event.screenY;
+          this.isDragging = true;
+          
+          this.mousemove = this.move.bind(this);
+          this.mouseup = this.end.bind(this);
+          this.keydown = this.listenKey.bind(this);
+          window.addEventListener('mouseup', this.mouseup)
+          window.addEventListener('mousemove', this.mousemove)
+          window.addEventListener('keydown', this.keydown)
+          window.addEventListener('blur', this.mouseup)
+          window.addEventListener('touchmove', this.mousemove)
+          window.addEventListener('touchend', this.mouseup)
+        }
+      }
+      
+      listenKey() {
+        // Escape key
+        L(event.keyCode)
+        if (event.keyCode == 27) {
+          this.end();
+        }
+      }
+      
+      end() {
+        window.removeEventListener('mousemove', this.mousemove)
+        window.removeEventListener('touchmove', this.mousemove)
+        window.removeEventListener('touchend', this.mouseup)
+        window.removeEventListener('mouseup', this.mouseup)
+        window.removeEventListener('blur', this.mouseup)
+        window.removeEventListener('keydown', this.keydown)
+        this.isDragging = false;
+        $('.title-wrap',this.shadowRoot)[0].classList.remove('isDrag')
+        if (this.getAttribute('preview') !== null) {
+          app.settings.data.windows.preview.x = this.posX;
+          app.settings.data.windows.preview.y = this.posY;
+        } else if (this.getAttribute('reference') !== null) {
+          app.settings.data.windows.reference.x = this.posX;
+          app.settings.data.windows.reference.y = this.posY;
+        }
+        app.settings.save();
+      }
+      
+      move(event) {
+        if (event.changedTouches) {
+          event = event.changedTouches[0];
+          this.posX += event.screenX - this.x;
+          this.posY += event.screenY - this.y;
+          this.x = event.screenX;
+          this.y = event.screenY;
+          this.posX = Math.max(5, this.posX);
+          this.posY = Math.max(35, this.posY);
+          let node = $('.window',this.shadowRoot)[0]
+          node.style.left = this.posX + 'px'
+          node.style.top = this.posY + 'px'
+        } else {
+          if (this.isDragging) {
+            this.posX += event.screenX - this.x;
+            this.posY += event.screenY - this.y;
+            this.x = event.screenX;
+            this.y = event.screenY;
+            this.posX = Math.max(5, this.posX);
+            this.posY = Math.max(35, this.posY);
+            let node = $('.window',this.shadowRoot)[0]
+            node.style.left = this.posX + 'px'
+            node.style.top = this.posY + 'px'
+          }
+        }
+      }
+      
+      toggle(forceState) {
+        let isClosed;
+        if (typeof(forceState) != 'undefined')
+          isClosed = this.classList.toggle('hide', !forceState);
+        else 
+          isClosed = this.classList.toggle('hide');
+          
+        if (!isClosed) {
+          this.bringToFront()
+        } else {
+          this.dispatchEvent(this.onclose);
+        }
+        // if (isClosed)
+          // this.dispatchEvent(this.onclose);
+        return !isClosed;
+      }
+      
+      bringToFront() {
+        for (let node of $(templateId)) {
+          node.style.zIndex = 17;
+        }
+        this.style.zIndex = 18;
+      }
+      
+      go2(event) {
+        event.preventDefault();
+      }
+      
+      setPosition(x, y) {
+        this.posX = x;
+        this.posY = y;
+        let node = $('.window',this.shadowRoot)[0];
+        node.style.left = this.posX + 'px'
+        node.style.top = this.posY + 'px'
+      }
+    }
+    customElements.define(templateId, CustomElement);
+  })();
+</script>

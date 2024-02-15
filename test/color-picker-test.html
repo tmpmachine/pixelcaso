@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+<body>
+
+<color-picker-v1 id='jspicker'></color-picker-v1>
+  
+  
+<template id="color-picker-v1">
+  <style>
+    .default-btn-style-1:hover {
+      background: #4c4c4c;
+    }
+    .default-btn-style-1 {
+      background: #3c3c3c;
+      color: white;
+      padding: 8px 12px;
+      border: 0;
+      cursor: pointer;
+    }
+    
+    #color-preview {
+      height: 32px;
+      border: 1px solid white;
+    }
+  
+    .color-opt {
+      margin-bottom: 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr auto 90px;
+      width: 100%;
+      gap: 4px;
+    }
+    .palette {
+        padding: 2px;
+    }
+    .palette .Box {
+      padding: 20px;
+      /*border-radius: 50%;*/
+      /*height: 32px;*/
+      box-shadow: 0 0 1px 1px #9d9d9d;
+      background: none;
+      cursor: pointer;
+      transition: background 250ms;
+    }
+    .palette .Colors {
+      justify-content: center;
+          display: inline-flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .hsl-input {
+      margin-bottom: 6px;
+    }
+    .color-input {
+      display: grid;
+      grid-template-rows: repeat(4, 1fr);
+      gap: 3px;
+      grid-auto-flow: column;
+      grid-template-columns: auto 1fr 50px auto;
+      margin: .75rem 0;
+    }
+    @media (min-width:700px) {
+      .palette {
+        max-width: 230px;
+      }
+      .palette .Box {
+        padding: 16px;
+      }
+    }
+  </style>
+  
+  <section>
+    Classic input : [in type='color']
+    Hex : [in @js-in-hex] [btn 'Store' @js-btn-store]
+    [ .d-grid
+      [ @color-preview]
+    ]
+    
+    [ .color-input
+      [s "H" title="Hue"]
+      [s "S" title="Saturation"]
+      [s "L" title="Light"]
+      [s "A" title="Alpha"]
+      
+      [in type="range" min="0" max="360" .hsl-input data-type="hue"]
+      [in type="range" min="1" max="100" .hsl-input data-type="saturation"]
+      [in type="range" min="1" max="100" .hsl-input data-type="light"]
+      [in type="range" min="0" max="100" .hsl-input data-type="alpha"]
+      
+      [in type="number" min="0" max="360" .hsl-input data-type="hue"]
+      [in type="number" min="0" max="100" .hsl-input data-type="saturation"]
+      [in type="number" min="0" max="100" .hsl-input data-type="light"]
+      [in type="number" min="0" max="100" .hsl-input data-type="alpha"]
+      
+      [s ""]
+      [s "%"]
+      [s "%"]
+      [s "%"]
+    ]
+      
+  </section>
+  
+  <section>
+  [ {m:1rem 0} .feature-eye-drop {d:none} {ta:center}
+    [btn .default-btn-style-1 "Open Screen Color Picker" .clickable data-callback="pick-color"]
+  ]
+  </section>
+  
+  <section>
+    [ .palette {m:auto} {mb:1rem}
+      [ .Colors]
+    ]
+  </section>
+  
+</template>
+
+<template id='tmp-palette-color'>
+  [ .Box .Color data-color=""]
+</template>
+
+<script>
+      let asd = console.log
+</script>
+    <script> $I = document.querySelector.bind(document) </script>
+
+<script>
+  (function() {
+    
+    let $I = document.querySelector.bind(document);
+    
+    let setColorTimeout;
+    let hsla = {
+      hue: 0,
+      saturation: 0,
+      light: 0,
+      alpha: 100,
+    };
+    let defaultPaletteColors = [
+      '#000000',
+      '#ffffff',
+      '#d8c292',
+      '#845ec2',
+      '#f9f871',
+      '#ff5e78',
+      '#5b5b5b',
+      '#a3d2ca',
+      '#11698e',
+      '#111d5e',
+      '#663f3f',
+      '#ffe227',
+      '#a98b98',
+      '#ff884b',
+      '#c0e218',
+      '#393e46',
+      '#222831',
+      '#f6f5f5',
+      '#01c5c4',
+      '#07689f',
+      '#206a5d',
+      '#fa1616',
+      '#faeee7',
+      '#c70039',
+      '#ffd868',
+    ];
+    let eventClickCallback = {
+      'pick-color': () => { openEyeDrop() },
+    };
+    
+    function openEyeDrop() {
+      let txt = $('#tmp-picker')[0].innerHTML;
+      let blob = new Blob([txt], {type:'text/html'})
+      window.open(URL.createObjectURL(blob), 'teswin', 'titlebar=no,width=280,height=160,top=142,left=64');
+    }
+    
+    let $ = (selector, node = document) => node.querySelectorAll(selector);
+    let version = 1;
+    let templateId = `color-picker-v${version}`;
+    class CustomElement extends HTMLElement {
+      constructor() {
+        super();
+         /* production-script
+        let template = document.createElement('template');
+        template.setAttribute('id', templateId);
+        template.innerHTML = "@replaceWithTemplateHTML@";
+        document.querySelector('html').append(template);
+        // */
+        let content = $(`template#${templateId}`)[0].content.cloneNode(true);
+        this.attachShadow({mode: 'open'}).append(content);
+      }
+      
+      checkFocus(event) {
+        if (event.type == 'focus') {
+        	window.stateManager.pushState([0]);
+        } else if (event.type == 'blur') {
+        	window.stateManager.popState([0]);
+        }
+      }
+      
+      hexToHSL(H) {
+        // Convert hex to RGB first
+        let r = 0, g = 0, b = 0;
+        if (H.length == 4) {
+          r = "0x" + H[1] + H[1];
+          g = "0x" + H[2] + H[2];
+          b = "0x" + H[3] + H[3];
+        } else if (H.length == 7) {
+          r = "0x" + H[1] + H[2];
+          g = "0x" + H[3] + H[4];
+          b = "0x" + H[5] + H[6];
+        }
+        // Then to HSL
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        let cmin = Math.min(r,g,b),
+            cmax = Math.max(r,g,b),
+            delta = cmax - cmin,
+            h = 0,
+            s = 0,
+            l = 0;
+      
+        if (delta == 0)
+          h = 0;
+        else if (cmax == r)
+          h = ((g - b) / delta) % 6;
+        else if (cmax == g)
+          h = (b - r) / delta + 2;
+        else
+          h = (r - g) / delta + 4;
+      
+        h = Math.round(h * 60);
+      
+        if (h < 0)
+          h += 360;
+      
+        l = (cmax + cmin) / 2;
+        s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+        s = +(s * 100).toFixed(1);
+        l = +(l * 100).toFixed(1);
+        
+        hsla.hue = h;
+        hsla.saturation = s;
+        hsla.light = l;
+        // return hsla
+      }
+      
+      covertHexToHSL(H) {
+        // Convert hex to RGB first
+        let r = 0, g = 0, b = 0;
+        if (H.length == 4) {
+          r = "0x" + H[1] + H[1];
+          g = "0x" + H[2] + H[2];
+          b = "0x" + H[3] + H[3];
+        } else if (H.length == 7) {
+          r = "0x" + H[1] + H[2];
+          g = "0x" + H[3] + H[4];
+          b = "0x" + H[5] + H[6];
+        }
+        // Then to HSL
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        let cmin = Math.min(r,g,b),
+            cmax = Math.max(r,g,b),
+            delta = cmax - cmin,
+            h = 0,
+            s = 0,
+            l = 0;
+      
+        if (delta == 0)
+          h = 0;
+        else if (cmax == r)
+          h = ((g - b) / delta) % 6;
+        else if (cmax == g)
+          h = (b - r) / delta + 2;
+        else
+          h = (r - g) / delta + 4;
+      
+        h = Math.round(h * 60);
+      
+        if (h < 0)
+          h += 360;
+      
+        l = (cmax + cmin) / 2;
+        s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+        s = +(s * 100).toFixed(1);
+        l = +(l * 100).toFixed(1);
+        
+        return {
+          hue: h,
+          saturation: s,
+          light: l,
+        }
+      }
+  
+      pickColor(event) {
+        if (event.target && event.target.classList.contains('Color')) {
+          let color = event.target.dataset.color;
+          app.drawing.tools.utility.pencil.changeColor(color);
+          this.hexToHSL(color);
+          this.setColorInputValue();
+          this.previewColor();
+        }
+      }
+      
+      initColorBox() {
+        let fragment = document.createDocumentFragment();
+        for (let color of defaultPaletteColors) {
+          let node = $('#tmp-palette-color')[0].content.firstElementChild.cloneNode();
+          fragment.append(node);
+          node.style.background = color;
+          node.dataset.color = color;
+        }
+        $('.palette .Colors', this.shadowRoot)[0].innerHTML = '';
+        $('.palette .Colors', this.shadowRoot)[0].append(fragment);
+      }
+  
+      setColor() {
+        // window.app.drawing.tools.utility.pencil.changeColor(`hsla(${hsla.hue},${hsla.saturation}%,${hsla.light}%,${hsla.alpha/100})`);
+      }
+  
+      previewColor(timeout = 100) {
+        $('#color-preview', this.shadowRoot)[0].style.background = `hsla(${hsla.hue},${hsla.saturation}%,${hsla.light}%,${hsla.alpha/100})`;
+        // $('#mobile-color-preview')[0].style.background = `hsla(${hsla.hue},${hsla.saturation}%,${hsla.light}%,${hsla.alpha/100})`;
+        clearTimeout(setColorTimeout);
+        setColorTimeout = window.setTimeout(this.setColor, timeout);
+      }
+  
+      RGBToHSL(colorData) {
+        let r = colorData[0],
+        g = colorData[1],
+        b = colorData[2];
+        
+        // Make r, g, and b fractions of 1
+        r /= 255;
+        g /= 255;
+        b /= 255;
+      
+        // Find greatest and smallest channel values
+        let cmin = Math.min(r,g,b),
+            cmax = Math.max(r,g,b),
+            delta = cmax - cmin,
+            h = 0,
+            s = 0,
+            l = 0;
+            
+        // Calculate hue
+        // No difference
+        if (delta == 0)
+          h = 0;
+        // Red is max
+        else if (cmax == r)
+          h = ((g - b) / delta) % 6;
+        // Green is max
+        else if (cmax == g)
+          h = (b - r) / delta + 2;
+        // Blue is max
+        else
+          h = (r - g) / delta + 4;
+        h = Math.round(h * 60);
+        // Make negative hues positive behind 360°
+        if (h < 0)
+          h += 360;
+          // Calculate lightness
+          l = (cmax + cmin) / 2;
+          // Calculate saturation
+          s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+          // Multiply l and s by 100
+          s = +(s * 100).toFixed(1);
+          l = +(l * 100).toFixed(1);
+        
+          return {h,s,l};
+      }
+  
+      changeHSL(event) {
+        hsla[event.target.dataset.type] = Number(event.target.value);
+        this.previewColor();
+        this.syncInputValue(event.target);
+      }
+      
+      syncInputValue(node) {
+        let type = node.dataset.type;
+        if (node.type == 'number') {
+          $(`.hsl-input[data-type="${type}"][type="range"]`, this.shadowRoot)[0].value = hsla[type];
+        } else {
+          $(`.hsl-input[data-type="${type}"][type="number"]`, this.shadowRoot)[0].value = hsla[type];
+        }
+      }
+  
+      setPrimaryColor(colorData) {
+        let r = colorData[0];
+        let g = colorData[1];
+        let b = colorData[2];
+        $('#color-preview', this.shadowRoot)[0].style.background = `rgb(${r},${g},${b})`;
+        // $('#mobile-color-preview')[0].style.background = `rgb(${r},${g},${b})`;
+        
+        let hslData = this.RGBToHSL(colorData);
+        hsla.hue = hslData.h;
+        hsla.saturation = hslData.s;
+        hsla.light = hslData.l;
+        this.setColorInputValue();
+      }
+        
+      setColorInputValue() {
+        let val;
+        for (let node of $('.hsl-input', this.shadowRoot)) {
+          node.value = hsla[node.dataset.type];
+        }
+      }
+        
+      initColorInput() {
+        // asd(this)
+        // asd(this.shadowRoot)
+        let $I = (this.shadowRoot.querySelector.bind(this.shadowRoot))
+        $I('#js-btn-store').addEventListener('click', (e) => {
+          this.setColorInputValue();
+          this.previewColor();
+          
+          defaultPaletteColors.splice(0,0,e.data.rgb);
+          defaultPaletteColors.length = 30;
+          this.initColorBox();
+        });
+        let inHexVal = ''
+        $I('#js-in-hex').addEventListener('input', (e) => {
+          let hexVal = (e.target.value.trim().replace(/#/g,''))
+          hexVal = '#' + hexVal
+          inHexVal = hexVal;
+          this.hexToHSL(hexVal)
+          this.setColorInputValue();
+          this.previewColor();
+        })
+        $I('input[type="color"]').addEventListener('change', (e) => {
+          let hexVal = (e.target.value)
+          let x = this.hexToHSL(hexVal)
+          // asd(x)
+          this.setColorInputValue();
+          this.previewColor();
+        })
+        // asd(1)
+        for (let input of $('.hsl-input', this.shadowRoot)) {
+          input.addEventListener('input', this.changeHSL.bind(this));
+          if (input.type == 'number') {
+            input.addEventListener('focus', this.checkFocus);
+            input.addEventListener('blur', this.checkFocus);
+          }
+        }
+      }
+      
+      clickHandler(event) {
+        try {
+          eventClickCallback[event.target.dataset.callback]();
+        } catch(e) { }
+      }
+      
+      attachListener() {
+        for (let node of $('.clickable', this.shadowRoot)) {
+          node.addEventListener('click', this.clickHandler.bind(this));
+        }
+      }
+      
+      featureCheck() {
+        if ('EyeDropper' in window) {
+          $('.feature-eye-drop', this.shadowRoot)[0].style.display = 'block';
+          window.addEventListener('message', e => {
+            if (e.data && e.data.type && e.data.type == 'eyedrop') {
+              hsla.hue = e.data.hsl.h;
+              hsla.saturation = e.data.hsl.s;
+              hsla.light = e.data.hsl.l;
+              this.setColorInputValue();
+              this.previewColor();
+              
+              defaultPaletteColors.splice(0,0,e.data.rgb);
+              defaultPaletteColors.length = 30;
+              this.initColorBox();
+            }
+            // if (event.origin !== "http://example.org:8080")
+              // return;
+          
+            // ...
+          }, false);
+        }
+      }
+  
+      init() {
+        this.initColorInput();
+        this.initColorBox();
+        $('.palette', this.shadowRoot)[0].addEventListener('click', this.pickColor.bind(this));
+        this.previewColor(0);
+        this.setColorInputValue();
+        this.attachListener();
+        this.featureCheck();
+      }
+
+    }
+    customElements.define(templateId, CustomElement);
+  })();
+  
+  
+  jspicker.init()
+</script>
+
+
+
+  
+</body>
+</html>

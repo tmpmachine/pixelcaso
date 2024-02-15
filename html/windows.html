@@ -1,0 +1,75 @@
+[drag-window-v1 .mini-window reference {pos:relative} .hide .no-select title="Reference Image"
+  [iframe src="" width="100%" {bor:0} height="100%"  slot="content"]
+]
+
+
+[drag-window-v1 .mini-window preview {pos:relative} title="Animation Preview" .hide .no-select
+  [ slot="content" .d-grid .h-100 {rows:1fr auto} {bg:white}
+    [ .ov-hidden
+      [can @animator]
+    ]
+    [ .d-flex {gap:10px} .justify-content-end .p-2 
+      [small .mr-auto .d-flex .align-items-center
+        Frame : [s label-frame "1"]
+      ]
+      [small .mr-auto .d-flex .align-items-center
+        [s "FPS" .mr-2] [in @in-fps type="number" min="1" value="12" oninput="animator.setFPS(this.value)" max="120" {w:50px}]
+      ]
+      [ripple-button-v1 .clickable data-callback="animator.toggle-play" .isPlay
+        [button slot="button"  {p:0.3rem} 
+          [i .material "play_arrow" .isPlay {fs:1.2rem}]
+          [i .material "pause" .isPause {fs:1.2rem}]
+        ]
+      ]
+      [ripple-button-v1 .clickable data-callback="scale-down"
+        [button slot="button"  {p:0.3rem}
+          [i .material "remove" {fs:1.2rem}]
+        ]
+      ]
+      [ripple-button-v1 .clickable data-callback="scale-up"
+        [button slot="button"  {p:0.3rem}
+          [i .material "add" {fs:1.2rem}]
+        ]
+      ]
+    ]
+  ]
+]
+
+[drag-window-v1 .mini-window grid-settings {pos:relative} title="Grid Settings" .hide .no-select
+  [ slot="content" .h-100 {bg:white} {p:1rem}
+    [
+      Grid size : [in type='number' min='2' value='4' oninput='ui.setGridSize(this.value)' name='grid-size']
+    ]
+    [
+      Line width : [in type='number' min='0.3' value='0.3' oninput='ui.setGridStrokeWidth(this.value)' name='grid-stroke-width' step='0.1']
+    ]
+    [
+      Line color : [in type='color' oninput='ui.setGridStroke(this.value)' name='grid-stroke']
+    ]
+  ]
+]
+
+
+[drag-window-v1 .mini-window data-name="layer-settings" {pos:relative} no-resize title="Layer Settings" .hide .no-select width="200" height="125" custom-size
+  [ slot="content" .d-grid .h-100 {bg:white}
+    [form .submittable data-callback="update-layer-settings" .py-2
+      [ .px-2 .mb-2
+        [in disabled name="name" .no-select .w-100 .mb-2]
+        [ .d-flex .justify-content-between
+          [small "Opacity"]
+          [small .beta "Beta"]
+        ]
+      ]
+      [ .px-2 .d-grid
+        [ .d-grid {gap:8px}
+          [in name="layerId" .d-none]
+          [in type="range" name="initialAlpha" min="0" max="1" step="0.01" value="1" .d-none]
+          [in type="range" name="alpha" min="0" max="1" step="0.01" value="1" .m-0]
+          [ripple-button-v1 .style2 .no-tap .d-grid .mt-2
+            [button slot="button"  {p:0.3rem}  "OK"]
+          ]
+        ]
+      ]
+    ]
+  ]
+]

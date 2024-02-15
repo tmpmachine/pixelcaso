@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+  <title>Pixelcaso</title>
+  <meta name="viewport" content="width=device-width"/>
+  <link href="css/style.css" rel="stylesheet"/>
+  <link href="css/widgets.css" rel="stylesheet"/>
+  <link rel="shortcut icon" sizes="16x16" type='image/x-icon' href="https://lh3.googleusercontent.com/-xo34WmWxmrY/YPZBHm5L1iI/AAAAAAAAP3w/nWEc-CK9WAg-1LLyAsaktN9mNQgdVzohACLcBGAsYHQ/Untitled.png">
+  <meta content="Online pixel art editor by PacoLemon" name='Description'/>
+  <meta content="Online pixel art editor by PacoLemon" property='og:description'/>
+  <meta content="Pixelcaso" property='og:title'/>
+  <meta content='notranslate' name='google'/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="google" content="notranslate"/>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script> window.asd = console.log </script>
+  <script>
+    {
+      let shadowEl = document.createElement('input');
+      Node.prototype.q = function(q) { return this.querySelector(q) || shadowEl }
+      Node.prototype.qf = function(q) { return this.querySelector(q) }
+      Node.prototype.qwe = function(q) { return this.querySelectorAll(q) }
+    }
+  </script>
+     
+</head>
+<body class="no-mobile is--show-grid">
+
+
+  <script>
+    function scopeStyle(prefix) {
+      prefix = prefix + ' ';
+      let style = document.querySelectorAll(`style[data-prefix="${prefix.trim()}"]`)[0];
+      let selectors = style.textContent.match(/.*?{(.|\n)*?}/g);
+      for (let i=0; i<selectors.length; i++) {
+        let selName = selectors[i].match(/.*?{/)[0].replace('{','');
+        let props = selectors[i].slice(selName.length);
+        selectors[i] = prefix+selName.split(',').join(','+[prefix])+props;     
+      }
+      style.textContent = selectors.join('\n');
+    }
+  </script>
+  <file src="web-components/color-picker.html"></file>
+  <file src="web-components/modal-v2-codetmp.html"></file>
+  <file src="web-components/modal-v2-color-palette.html"></file>
+  <file src="web-components/popup.html"></file>
+  <file src="web-components/lightbox.html"></file>
+  <file src="web-components/ripple-button-v1.html"></file>
+  <file src="web-components/drag-window-v1.html"></file>
+  <file src="web-components/menu-bar-v1.html"></file>
+ 
+  [pre @debug .fixed {t:0} {l:0}]
+  
+  [ .home-mobile-screen
+    [ {bg:#202020} {d:none}
+    ]
+    [ .px-16 {h:100%} .ov-auto
+      
+      [ {mh:19px} {mt:1rem} {mb:1rem}
+        [
+          [small .app-pwa-message {mh:16px}]
+        ]
+      ]
+    
+      [ {d:grid;rows:1fr auto;h:100%}
+        [
+          [ {mh:50px}
+            [ .d-none
+              [btn .app-pwa-install-btn .mobile-button-stytle-1 {p:8px 12px} {mt:1rem}
+                Install Pixelcaso
+              ]
+            ]          
+          ]
+          
+          <!--
+          [p {lh:1.5rem}
+            Start drawing by clicking the pencil button below or open a project file.
+          ]
+          -->
+          
+          <h2>What's new?</h2>
+          <!--
+          [ul
+            [li
+              [a href="https://pixelcaso.blogspot.com/2022/01/pixelcaso-v2194-changelog.html" "Pixelcaso v2.19.4 Changelog" {col:white}]
+            ]
+          ]
+          -->
+          
+          <style>
+            .app-updates-container > div {
+              display: inline-flex;
+            }
+            .app-updates-container a {
+              color: inherit;
+              display: list-item;
+              margin-left: 1rem;
+              padding: 6px;
+            }
+          </style>
+          
+          <div class="app-updates-container">
+            Loading news ...
+          </div>
+          
+          <!-- mobile project list -->
+          [ {d:grid} {cols:1fr 1fr} {gap:24px} {mt:2rem} {mb:3rem} .file-save-container {ov:auto} {h:300px} .clickable data-callback='modals.recent-projects-click-handler']
+          
+          <script> L = console.log </script>
+          <script>
+            
+            BloggerRelatedPosts('.app-updates-container')
+            
+            function BloggerRelatedPosts(selector) {
+              
+              let $ = document.querySelectorAll.bind(document);
+              
+              fetch('https://www.blogger.com/feeds/2726658452429477844/posts/summary/-/App Updates?alt=json&max-results=5&random='+new Date().getTime())
+              .then(function(response) {
+                return response.json();
+              })
+              .then(function(result) {
+                showFeeds(result.feed.entry)
+              });
+              
+              function showFeeds(entries) {
+                
+                let container = document.createDocumentFragment();
+                
+                if (entries) {
+                  for (let item of entries) {
+                    let tmp = template.clone('#tmp-related-posts');
+                    let anchord = tmp.getChild('a')[0];
+                    anchord.textContent = item.title.$t;
+                    anchord.href = item.link.find(x => x.rel == 'alternate').href;
+                    container.append(tmp);
+                  }
+                  $(selector)[0].innerHTML = '';
+                  $(selector)[0].append(container);
+                } else {
+                  $(selector)[0].innerHTML = 'No updates';
+                }
+                
+              }  
+              
+            }
+            
+            
+            window.template = (function() {
+            
+              let $ = document.querySelectorAll.bind(document);
+              let child = function(selector, node=document) { return node.querySelectorAll(selector); }
+              
+              function getChild(selector) {
+                let nodes = child(selector, this);
+                return nodes;
+              }
+              
+              function clone(selector) {
+                
+                let node = $(selector)[0].content.cloneNode(true);
+                node.getChild = getChild;
+                return node;
+              }
+              
+              return {
+                clone,
+              };
+              
+            })();
+            
+          </script>
+          
+          <template id="tmp-related-posts">
+            <div>
+              <a href='#'></a>
+            </div>
+          </template>
+          
+          <style>
+            .thumb-save .thumbnail {
+              height: 110px;
+              background: gray;
+            }
+            .thumb-save .__remove-btn {
+              padding: 6px 12px;
+              margin: 1rem 0;
+              max-width: 120px;
+            }
+          </style>
+          
+          <template id="tmp-file-thumb">
+            [ .thumb-save
+              [ .thumbnail .d-flex .justify-content-center]
+              [ .filename]
+              [ .d-flex .justify-content-end
+                [ .btn .mobile-button-stytle-1 {p:6px 12px} .text-center .__remove-btn
+                  Delete
+                ]
+              ]
+            ]
+          </template>
+          
+        ]
+      
+        <style>
+  .footer-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.footer-links a:not(:last-child):after {
+    content: '·';
+    margin: 16px;
+}
+</style>
+      
+        [ {ta:center}
+          [btn {w:54px} {h:54px} .clickable data-callback="mobile.start-drawing" {rad:50%} .mobile-button-stytle-1
+            [i .material "edit"]
+          ]
+          [ {m:1rem 0}
+            [small "or"]
+          ]
+          [ 
+            [btn .clickable data-callback="mobile.open-project" .btn-mobile-save .mobile-button-stytle-1
+              Open project file
+            ]
+          ]
+          [ {p:1rem} {d:flex} {justify-content:center} {mt:1rem} .footer-links
+            [a href="https://www.instagram.com/pixelcaso/" "Instagram"] 
+            [a href="https://www.youtube.com/channel/UCnKC_0t5WsFwtc7n6RXsEXg" "YouTube"]
+            [a href="https://tmpmachine7.itch.io/pixelcaso" "Itch.io"]
+          ]
+        ]
+      ]
+    ]
+  ]
+  
+  [  .mobile-ui-button {l:12px} {t:16px} .align-items-center {h:42px} .d-flex
+    [btn {w:42px} {h:42px} .clickable data-callback="mobile.back" {rad:50%} .btn-mobile-back .mobile-button-stytle-1
+      [i .material "arrow_back_ios"]
+    ]
+  ]
+  [  .mobile-ui-button {l:74px} {t:20px} .align-items-center {h:36px} .d-flex
+    [btn {w:40px} {h:40px} .clickable data-callback="mobile.canvas-setup" {rad:50%}  .mobile-button-stytle-1
+      [i .material "settings"]
+    ]
+  ]
+  [  .mobile-ui-button {l:130px} {t:20px} .align-items-center {h:36px} .d-flex .hide
+    [btn {w:40px} {h:40px} .clickable data-callback="mobile.toggle-awake" {rad:50%} .btn-mobile-awake .mobile-button-stytle-1
+      [i .material "bolt"]
+    ]
+  ]
+  
+  [  .mobile-ui-button {r:96px} {t:16px} .align-items-center {h:42px} .d-flex
+    [btn .clickable data-callback="mobile.save-project" "Save project" .btn-mobile-save .mobile-button-stytle-1]
+  ]
+  [  .mobile-ui-button {r:12px} {t:16px} .align-items-center {h:42px} .d-flex 
+    [btn .clickable data-callback="toggle-modal" data-target="export-image" "Export" .btn-mobile-save .mobile-button-stytle-1]
+  ]
+  [  .mobile-ui-button {r:12px} {b:115px} .mobile-button-stytle-1  .bottom-float-buttons {rad:28px}
+    [btn  .clickable data-callback="editor.undo" {bg:none;bor:none;p:10px 16px}
+      [i .material "undo" {col:#f9f9f9}]
+    ]
+    [btn  .clickable data-callback="editor.redo" {bg:none;bor:none;p:10px 16px}
+      [i .material "redo" {col:#f9f9f9}]
+    ]
+  ]
+  [  .mobile-ui-button {l:124px} {b:104px} .mobile-button-stytle-1  .bottom-float-buttons {d:none}
+    [btn  .clickable data-callback="editor.zoom-out" {bg:none;bor:none;p:4px 12px}
+      [i .material "zoom_out" {col:#f9f9f9}]
+    ]
+    [btn  .clickable data-callback="editor.zoom-in" {bg:none;bor:none;p:4px 12px}
+      [i .material "zoom_in" {col:#f9f9f9}]
+    ]
+  ]
+  [ .mobile-ui-button {l:78px} {b:116px} .align-items-center {h:42px} .d-flex .bottom-float-buttons 
+    [btn {w:50px} {h:50px} .clickable data-callback="mobile.toggle-layers" {rad:50%} .mobile-button-stytle-1
+      [i .material "layers"]
+    ]
+  ]
+  [ .mobile-ui-button {l:12px} {b:116px} .align-items-center {h:42px} .d-flex .bottom-float-buttons
+    [btn {w:50px} {h:50px} .clickable data-callback="mobile.toggle-palette" {rad:50%} .btn-mobile-palette .mobile-button-stytle-1
+      [i .material "palette"]
+    ]
+    [btn {w:22px} {h:22px} @mobile-color-preview .clickable data-callback="mobile.toggle-palette" {rad:50%} .btn-mobile-palette .mobile-button-stytle-1 {t:-27px;l:-4px} .absolute]
+  ]
+  
+  <!--
+  [  .mobile-ui-button {r:12px} {b:104px} .mobile-button-stytle-1
+    [btn  .clickable data-callback="toggle-modal" data-target="color-palette" {bg:none;bor:none;h:28px;w:35px;}]
+  ]
+  -->
+  
+  <script>
+    
+    let routes = {
+    }
+    
+    let appScreen = (function () {
+      
+      let SELF = {};
+      let history = [];
+      
+      SELF.goto = function() {
+        
+      }
+      
+      return SELF;
+      
+    })();
+    
+    function HomeScreen() {
+      
+    }
+    
+    function DrawingScreen() {
+      
+    }
+    
+  </script>
+  
+  
+  [ .absolute  {b:0} {z:100} .w-100 {bg:black} .mobile-tools {h:65px} data-mode="default"
+    [ data-mode="default" .d-flex .justify-content-start .h-100
+      [l .clickable data-callback="preview-animation" .btn-style-1
+        [i .material "directions_run"]
+      ]
+      [l .clickable data-callback="prev-frame" .btn-style-1
+        [i .material "navigate_before"]
+      ]
+      [l .clickable data-callback="next-frame" .btn-style-1
+        [i .material "navigate_next"]
+      ]
+      [l .clickable data-callback="undo" .btn-style-1 .no-select
+        [i .material "undo"]
+      ]
+      [l .clickable data-callback="redo" .btn-style-1 .no-select
+        [i .material "redo"]
+      ]
+      [l .clickable data-callback="tool-selection" .btn-style-1
+        [i .material "highlight_alt"]
+      ]
+    ]
+    [ data-mode="selection" .d-flex .justify-content-start .h-100
+      [l .clickable data-callback="copy-selection" .btn-style-1 .no-select
+        [i .material "content_copy"]
+      ]
+      [l .clickable data-callback="cut-selection" .btn-style-1 .no-select
+        [i .material "content_cut"]
+      ]
+      [l .clickable data-callback="paste-selection" .btn-style-1 .no-select
+        [i .material "content_paste"]
+      ]
+      [l .clickable data-callback="move-selection" .btn-style-1 .no-select
+        [i .material "open_with"]
+      ]
+      [l .clickable data-callback="drop-selection" .btn-style-1 .no-select
+        [i .material "done_outline"]
+      ]
+    ]
+  ]
+  
+  [ {d:grid;grid-template-columns:1fr auto;h:100%} {ov:hidden}
+    [section .ov-hidden
+    
+      [input onpaste="ui.getImageData(event)" @nono {bor:0} onblur="this.style.display='none'" {pos:absolute} {opacity:0}]
+      [ {d:grid;grid-template-rows:auto 1fr auto;h:100%} {ov:hidden}
+        [
+          <menu-bar-v1 class="relative">
+            <div class="menu-bar" slot="menu">
+              <div class="drop-menu">
+          	    [ tabindex="0" .isRoot "File"]
+                [ .submenu {w:250px}
+                  [btn .item .menu-link data-callback="file.new-project" data-shortcut="Alt + N" "New Project"]
+                  [btn .item .menu-link data-callback="file.toggle-modal-project" data-shortcut="Ctrl + O" 
+                    Open recent project
+                  ]
+                  [btn .item .menu-link data-callback="file.openProject" data-modal-target="open-project" data-shortcut="Ctrl + Shift + O" 
+                    Open project file
+                  ]
+                  <!--[btn .item .menu-link data-callback="file.importProject" "Import Project"]-->
+                  [btn .item .menu-link data-callback="file.saveProject" data-shortcut="Ctrl + S" "Save Project"]
+                  [hr]
+                  [btn .item .menu-link data-callback="file.exportProject" "Export Project"]
+                  [btn .item .clickable data-callback="toggle-modal" data-target="export-image" "Export as Image"]
+                  [btn .item .clickable data-callback="toggle-modal" data-target="export-video"
+                    [
+                      Export as Video
+                    ]
+                  ]
+                ]
+              </div>
+              <div class="drop-menu">
+          	    [ tabindex="0" .isRoot "Edit"]
+                [ .submenu
+                  [btn .item .menu-link data-callback="editor.undo" data-shortcut="Z" "Undo"]
+                  [btn .item .menu-link data-callback="editor.redo" data-shortcut="Y" "Redo"]
+                  [btn .item .menu-link data-callback="editor.select-all" data-shortcut="Ctrl + A" "Select All"]
+                  [btn .item .menu-link data-callback="editor.clear-selection" data-shortcut="Esc / Ctrl + D" "Clear Selection"]
+                  [hr]
+                  [btn .item .menu-link data-callback="editor.copy" data-shortcut="Ctrl + C" "Copy"]
+                  [btn .item .menu-link data-callback="editor.cut" data-shortcut="Ctrl + X" "Cut"]
+                  [btn .item .menu-link data-callback="editor.paste" data-shortcut="Ctrl + V" "Paste"]
+                  [hr]
+                  [btn .item .menu-link data-callback="editor.set-grid-size" "Grid settings" data-shortcut="Alt + G"]
+                  [btn .item .menu-link data-callback="file.resize-canvas" data-shortcut="Alt + Shift + R" "Resize Canvas"]
+                ]
+              </div>
+              <div class="drop-menu">
+          	    [ tabindex="0" .isRoot "View"]
+                [ .submenu
+                  [btn .item .menu-link data-callback="view.zoomIn" data-shortcut="Ctrl + +" "Zoom In"]
+                  [btn .item .menu-link data-callback="view.zoomOut" data-shortcut="Ctrl + -" "Zoom Out"]
+                  [btn .item .menu-link data-callback="view.zoomReset" data-shortcut="Ctrl + 0" "Reset Zoom"]
+                  [btn .item .menu-link data-callback="view.show-grid" data-shortcut="Ctrl + G" "Show Grid"]
+                  [btn .item .menu-link data-callback="view.show-grid-pixel" data-shortcut="Ctrl + Shift + G" "Show Pixel Grid"]
+                ]
+              </div>
+              <div class="drop-menu">
+          	    [ tabindex="0" .isRoot "Tools"]
+                [ .submenu {w:240px}
+                  [btn .item .menu-link data-callback="select-tool" data-tool="hand" data-shortcut="Space (hold)" "Pan"]
+                  [btn .item .menu-link data-callback="select-tool" data-tool="move" data-shortcut="M" "Move selection"]
+                  [btn .item .menu-link data-callback="select-tool" data-tool="select" data-shortcut="S" "Rectangular Selection"]
+                  [btn .item .menu-link data-callback="select-tool" data-tool="wand" data-shortcut="Shift + S" "Tone Selection"]
+                  [btn class="d-none w3-padding menu-link" data-callback="select-tool" data-tool="move" data-shortcut="M" "Move Selection"]
+                  [hr]
+                  [btn .item .menu-link data-callback="select-tool" data-tool="pencil" data-shortcut="1 / P" "Pencil"]
+                  [btn .item .menu-link data-callback="select-tool" data-tool="eraser" data-shortcut="2 / E" "Eraser"]
+                  [btn .item .menu-link data-callback="select-tool" data-tool="picker" data-shortcut="3 / K" "Color Picker"]
+                  [hr]
+                  [btn .item .menu-link data-callback="select-tool" data-tool="line" data-shortcut="L" "Line"]
+                  [btn .item .menu-link data-callback="select-tool" data-tool="fill" data-shortcut="F" "Flood Fill"]
+                  [btn .item .menu-link data-callback="tools.decrease-pixel" data-shortcut="&lsqb;" "Decrease Pixel Size"]
+                  [btn .item .menu-link data-callback="tools.increase-pixel" data-shortcut="&rsqb;" "Increase Pixel Size"]
+                ]
+              </div>
+              <div class="drop-menu">
+          	    [ tabindex="0" .isRoot "Image"]
+                [ .submenu {w:240px}
+                  [btn .item .menu-link data-callback="image.flip-horizontal" data-shortcut="Shift + H" "Flip horizontal"]
+                  [btn .item .menu-link data-callback="image.flip-vertical" data-shortcut="Shift + V" "Flip vertical"]
+                  [hr]
+                  [btn .item .menu-link data-callback="image.crop-to-selection" data-shortcut="Alt + Shift + X" "Crop to selection"]
+                  [ {d:none}
+                    [hr]
+                    [btn .item .menu-link data-callback="image.toggle-repeat-mode" 
+                      [
+                        Repeat X-axis [small .beta "(Beta)"]
+                      ]
+                    ]
+                  ]
+                ]
+              </div>
+              <div class="drop-menu">
+          	    [ tabindex="0" .isRoot "Timeline"]
+                [ .submenu {w:230px}
+                  [btn .item .clickable data-callback="new-layer" data-shortcut="Alt + Shift + N" "New Layer"]
+                  [btn .item .clickable data-callback="toggle-layer" data-shortcut="Shift + X" "Toggle Layer Visibility"]
+                  [hr]
+                  [btn .item .menu-link data-callback="frame.prev" data-shortcut="A" "Previous Frame"]
+                  [btn .item .menu-link data-callback="frame.next" data-shortcut="D" "Next Frame"]
+                ]
+              </div>
+              <div class="drop-menu">
+          	    [ tabindex="0" .isRoot "Window"]
+                [ .submenu
+                  [btn .item .menu-link data-callback="window.layers" data-shortcut="Alt + T" "Timeline"]
+                  [btn .item .menu-link data-callback="window.color" data-shortcut="Alt + C" "Color Palette"]
+                  [btn .item .menu-link data-callback="window.reference" data-shortcut="Alt + R" "Reference Image" {d:none}]
+                  [btn .item .menu-link data-callback="window.preview" data-shortcut="Alt + A" "Animation Preview"]
+                  [hr]
+                  [btn .item .menu-link data-callback="window.reset" "Reset Windows"]
+                ]
+              </div>
+              <div class="drop-menu">
+          	    <div class="isRoot" tabindex="0">About</div>
+                <div class="submenu">
+                  <a class="item" href="https://pixelcaso.blogspot.com/" target="blank" style="text-decoration:none;">Blog</a>
+                  <a class="item" href="https://www.youtube.com/channel/UCnKC_0t5WsFwtc7n6RXsEXg" target="blank" style="text-decoration:none;">YouTube</a>
+                  <a class="item" href="https://www.instagram.com/pixelcaso/" target="blank" style="text-decoration:none;">Instagram</a>
+                  <a class="item" href="https://twitter.com/tmpmachine" target="blank" style="text-decoration:none;">Twitter</a>
+                  <a class="item" href="https://tmpmachine7.itch.io/pixelcaso" target="blank" style="text-decoration:none;">Itch.io</a>
+                  [hr]
+                  [btn .item onclick="pwaCacher.update()" "Check updates"]
+                  [btn .item onclick="pwaCacher.removeUpdate()" "Clear app cache"]
+                </div>
+              </div>
+              <div class="drop-menu" style="display:none">
+          	    [ tabindex="0" .isRoot "Project"]
+                [ .submenu
+                  [btn .item .menu-link data-callback="project.switch" data-index="0" "1"]
+                  [btn .item .menu-link data-callback="project.switch" data-index="1" "2"]
+                ]
+              </div>
+            </div>
+          </menu-bar-v1>
+        ]
+        
+        <style>
+          #js-grid-guidelines, #js-grid-pixel-guidelines  {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 0 0;
+          }
+          #work-canvas-container {
+            background-position: 0 0!important;
+            background-repeat: repeat!important;
+          }
+        </style>
+        
+        <!-- MAIN EDITOR, SIDEBAR-->
+        [ {pos:relative} {ov:hidden} .d-grid @work-canvas-container
+          
+          <!-- CANVAS -->
+          [ .ov-hidden .js-drawing-container
+            <!--[ @resizer {p:4px} {bg:red} {pos:absolute} {z:88} {cursor: url('assets/rotate.png'), auto;	}]-->
+            <!--[ @center-selection {p:4px} {bg:red} {pos:absolute} {z:88} {cursor: url('assets/rotate.png'), auto;	}]-->
+            <svg id="js-grid-pixel-guidelines" width="0" height="0" xmlns="http://www.w3.org/2000/svg"> 
+                <defs> 
+                    <pattern id="pixel-grid" width="16" height="16" patternUnits="userSpaceOnUse"> 
+                        <path d="M 16 0 L 0 0 0 16" fill="none" stroke="#00000078" stroke-width="0.3"></path> 
+                    </pattern> 
+                </defs> 
+                <rect width="100%" height="100%" fill="url(#pixel-grid)"></rect> 
+            </svg>
+            <svg id="js-grid-guidelines" width="0" height="0" xmlns="http://www.w3.org/2000/svg"> 
+                <defs> 
+                    <pattern id="small-grid" width="32" height="32" patternUnits="userSpaceOnUse"> 
+                        <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#000000" stroke-width="0.3"></path> 
+                    </pattern> 
+                </defs> 
+                <rect width="100%" height="100%" fill="url(#small-grid)"></rect> 
+            </svg>
+            [can @canvas width="580" height="580"]
+          ]
+          <!-- SIDEBAR -->
+          [ .d-flex .pos-relative
+            [ .pos-absolute {r:100%} .t-0 .p-half .d-flex .flex-column .gap-full
+              <!-- color picker button -->
+              [btn {w:50px} {h:50px} .clickable data-callback="mobile.toggle-palette" {rad:50%} .btn-mobile-palette .mobile-button-stytle-1
+                [i .material "palette"]
+              ]
+              <!-- toggle layers -->
+              [btn {w:50px} {h:50px} .clickable data-callback="toggle-layers" {rad:50%} .mobile-button-stytle-1
+                [i .material "layers"]
+              ]
+            ]
+            [
+              <!-- color picker window -->
+              <modal-v2-color-palette class="modal-component" data-name="color-palette">
+                <div class="modal" slot="content">
+                  [ .d-flex .justify-content-between .align-items-center {bg:#464646}
+                    <h5 class="m-0"><b>Color Palette</b></h5>
+                    <button class="toggler-icon clickable" style="color:inherit" data-callback="toggle-palette">×</button>
+                  ]
+                  [ 
+                    [sidebar .no-select .ov-hidden .d-grid {rows:auto 1fr}
+                      [  .d-grid {cols:1fr auto} {bg:#464646} {d:none}
+                        [s "Color Palette"  .p-2 {fs:.8rem}]
+                        [button {p:0.5rem} .clickable data-callback="toggle-palette" {bg:none}  {col:white} {bor:0} .pointer
+                          [i .material "close" {fs:1rem}]
+                        ]
+                      ]
+                      [ .ov-auto .p-2
+                        [ .isPalette .section
+                          [color-picker-v1 @color-picker]
+                        ]
+                      ]
+                    ]
+                  ]
+                </div>
+              </modal-v2-color-palette>
+            ]
+          ]
+      
+          
+          <!--
+          [sidebar .hide .no-select {mw:250px} {col:white} .ov-hidden .d-grid {rows:auto 1fr}
+            [  .d-grid {cols:1fr auto} {bg:#464646} 
+              [s "Color Palette"  .p-2 {fs:.8rem}]
+              [button {p:0.5rem} .clickable data-callback="toggle-palette" {bg:none}  {col:white} {bor:0} .pointer
+                [i .material "close" {fs:1rem}]
+              ]
+            ]
+            [ .ov-auto .p-2
+              [ .isPalette .section
+                [color-picker-v1 @color-picker]
+              ]
+            ]
+          ]
+          -->
+          
+          
+          <!-- floating tools (mobile) -->
+          [ .widget-toolbar .skin-mobile .clickable data-callback="on-floating-tool-click" .pos-absolute .ov-visible
+            
+            <!-- mobile tools -->
+            [ .container-toolbar
+              [ .isActive data-tool="pencil" .tool
+                [i .material "edit" .icon]
+                [ .helpnote "Pencil (1 / P)"]
+              ]
+              [ data-tool="eraser" .tool
+                [i .icon
+                  [svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" fill="black" viewBox="0 0 24 24"
+                  <path d="M5.662 23l-5.369-5.365c-.195-.195-.293-.45-.293-.707 0-.256.098-.512.293-.707l14.929-14.928c.195-.194.451-.293.707-.293.255 0 .512.099.707.293l7.071 7.073c.196.195.293.451.293.708 0 .256-.097.511-.293.707l-11.216 11.219h5.514v2h-12.343zm3.657-2l-5.486-5.486-1.419 1.414 4.076 4.072h2.829zm6.605-17.581l-10.677 10.68 5.658 5.659 10.676-10.682-5.657-5.657z"></path>
+                  ]
+                ]
+                [ .helpnote "Eraser (2 / E)"]
+              ]
+              [ .tool data-tool="picker"
+                [i .material .icon "colorize"]
+                [ .helpnote "Color picker (3 / K)"]
+              ]
+              [ .tool data-tool="hand"
+                [i .material .icon "pan_tool"]
+                [ .helpnote "Pan tool (Hold space)"]
+              ]
+              [ .tool data-tool="line"
+                [i .material .icon "maximize"]
+                [ .helpnote "Line (L)"]
+              ]
+              [ .tool data-tool="rectangle" 
+                [i .material .icon "crop_square"]
+                [ .helpnote "Rectangle shape (O)"]
+              ]
+              [ .tool data-tool="ellipse" 
+                [i .material .icon "radio_button_unchecked"]
+                [ .helpnote "Ellipse shape (U)"]
+              ]
+              [ .tool data-tool="fill"
+                [i .material .icon "format_color_fill"]
+                [ .helpnote "Flood fill (F)"]
+              ]
+              [ .tool data-tool="select"
+                [i .material .icon "highlight_alt"]
+                [ .helpnote "Rectangular selection (S)"]
+              ]
+              [ .tool data-tool="wand"
+                [i .material .icon "auto_fix_high"]
+                [ .helpnote "Tone selection (Shift + S)"]
+              ]
+              [ .tool data-tool="move"
+                [i .material .icon "open_with"]
+                [ .helpnote "Move selection (M)"]
+              ]
+              [ .tool .clickable data-callback='editor.zoom-in'
+                [i .material .icon "zoom_in"]
+                [ .helpnote "Zoom In"]
+              ]
+              [ .tool .clickable data-callback='editor.zoom-out'
+                [i .material .icon "zoom_out"]
+                [ .helpnote "Zoom Out"]
+              ]
+              
+            ]
+            
+            <!--drawing pane-->
+            [ .mobile-drawing-pane {p:8px} .d-flex {gap:10px} .ov-auto .mobile-pane data-name='drawing'
+              [ .in-size-container
+                [small "Size"] [in type="range" value="1" min="1" max="10" oninput="uiMobile.updatePenSize(parseInt(this.value))" .in-line-size]
+              ]
+            ]
+            
+            <!--selection pane-->
+            [ .mobile-selection-pane {p:8px} .d-flex {gap:10px} .ov-auto .hide .mobile-pane data-name='selection'
+              [btn .clickable .ripple data-callback="editor.clear-selection"
+                [small
+                  [i .material {fs:16px} .icon "clear"] Clear selection
+                ]
+              ]
+              [btn .clickable .ripple data-callback="editor.cut"
+                [small
+                  [i .material {fs:16px} .icon "cut"] Cut
+                ]
+              ]
+              [btn .clickable .ripple data-callback="editor.copy"
+                [small
+                  [i .material {fs:16px} .icon "copy"] Copy
+                ]
+              ]
+              [btn .clickable .ripple data-callback="editor.paste"
+                [small
+                  [i .material {fs:16px} .icon "paste"] Paste
+                ]
+              ]
+              [btn .clickable .ripple data-callback="image.flip-horizontal"
+                [small
+                  [i .material {fs:16px} .icon "flip"] Flip horizontal
+                ]
+              ]
+              [btn .clickable .ripple data-callback="image.flip-vertical"
+                [small
+                  [i .material {fs:16px} .icon "flip" {transform:rotate(90deg)}] Flip vertical
+                ]
+              ]
+            ]
+            
+            <!-- layer pane -->
+            [ .mobile-setting-menu .hide {ov:auto} .mobile-pane data-name='layers'
+              [ .d-flex
+                [ .tool {bg:gainsboro} .d-flex .align-items-center .clickable data-callback="mobile.toggle-layers"
+                  [i .material .icon "arrow_back_ios" {z:1}]
+                ]
+                [ .tool .clickable data-callback="mobile.layer.add"
+                  [i .material .icon "add"]
+                  [ .helpnote "New"]
+                ]
+                [btn {bor:0} .tool .clickable data-callback="mobile.layer.rename" .btn-layer .btn-layer-rename
+                  [i .material {z:1;col:black} .icon "edit"]
+                  [ .helpnote "Rename"]
+                ]
+                [btn {bor:0} .tool .clickable data-callback="mobile.layer.delete" .btn-layer .btn-layer-delete
+                  [i .material {z:1;col:black} .icon "delete"]
+                  [ .helpnote "Delete"]
+                ]
+                [btn {bor:0} .tool .clickable data-callback="mobile.layer.move-down" .btn-layer .btn-layer-down
+                  [i .material {z:1;col:black} .icon "arrow_downward"]
+                  [ .helpnote "Move down"]
+                ]
+                [btn {bor:0} .tool .clickable data-callback="mobile.layer.move-up" .btn-layer .btn-layer-up
+                  [i .material {z:1;col:black} .icon "arrow_upward"]
+                  [ .helpnote "Move up"]
+                ]
+              ]
+            ]
+            
+            <!-- # layers (mobile) -->
+            [ .mobile-setting-pane .hide .ov-auto .mobile-pane data-name='layers']
+            
+          ]
+
+          
+          <!-- # floating tools -->
+          [ .widget-toolbar .skin-desktop .absolute {t:40px} {l:10px}  .tool-bar .clickable data-callback="on-floating-tool-click" .no-select .ov-visible .d-grid {cols:1fr 1fr}
+          
+            [ .inner .d-grid {cols:1fr}
+              [ .isActive data-tool="pencil" .tool
+                [i .material "edit" .icon]
+                [ .helpnote "Pencil (1 / P)"]
+              ]
+              [ data-tool="eraser" .tool
+                [i .icon
+                  [svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" fill="black" viewBox="0 0 24 24"
+                  <path d="M5.662 23l-5.369-5.365c-.195-.195-.293-.45-.293-.707 0-.256.098-.512.293-.707l14.929-14.928c.195-.194.451-.293.707-.293.255 0 .512.099.707.293l7.071 7.073c.196.195.293.451.293.708 0 .256-.097.511-.293.707l-11.216 11.219h5.514v2h-12.343zm3.657-2l-5.486-5.486-1.419 1.414 4.076 4.072h2.829zm6.605-17.581l-10.677 10.68 5.658 5.659 10.676-10.682-5.657-5.657z"></path>
+                  ]
+                ]
+                [ .helpnote "Eraser (2 / E)"]
+              ]
+              [ .tool data-tool="picker"
+                [i .material .icon "colorize"]
+                [ .helpnote "Color picker (3 / K)"]
+              ]
+              [ .tool data-tool="hand"
+                [i .material .icon "pan_tool"]
+                [ .helpnote "Pan tool (Hold space)"]
+              ]
+              [ .tool data-tool="line"
+                [i .material .icon "maximize"]
+                [ .helpnote "Line (L)"]
+              ]
+              [ .tool data-tool="rectangle" 
+                [i .material .icon "crop_square"]
+                [ .helpnote "Rectangle shape (O)"]
+              ]
+              [ .tool data-tool="ellipse" 
+                [i .material .icon "radio_button_unchecked"]
+                [ .helpnote "Ellipse shape (U)"]
+              ]
+              [ .tool data-tool="fill"
+                [i .material .icon "format_color_fill"]
+                [ .helpnote "Flood fill (F)"]
+              ]
+              [ .tool data-tool="select"
+                [i .material .icon "highlight_alt"]
+                [ .helpnote "Rectangular selection (S)"]
+              ]
+              [ .tool data-tool="wand"
+                [i .material .icon "auto_fix_high"]
+                [ .helpnote "Tone selection (Shift + S)"]
+              ]
+              [ .tool data-tool="move"
+                [i .material .icon "open_with"]
+                [ .helpnote "Move selection (M)"]
+              ]
+            ]
+            [
+              [ .tool .clickable data-callback='editor.undo'
+                [i .material .icon "undo"]
+                [ .helpnote "Undo"]
+              ]
+              [ .tool .clickable data-callback='editor.redo'
+                [i .material .icon "redo"]
+                [ .helpnote "Redo"]
+              ]
+              [ .tool .clickable data-callback='editor.zoom-in'
+                [i .material .icon "zoom_in"]
+                [ .helpnote "Zoom In"]
+              ]
+              [ .tool .clickable data-callback='editor.zoom-out'
+                [i .material .icon "zoom_out"]
+                [ .helpnote "Zoom Out"]
+              ]
+            ]
+            
+            <style>
+              .in-size-container {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                align-items: center;
+                width: 100%;
+                grid-gap: 12px;
+                margin-right: 1rem;
+              }
+              .in-line-size {
+                width: 100%;
+                display: block;
+                max-width: 280px;
+                margin: auto;
+              }
+            </style>
+          
+          ]
+          
+          [ {b:70px;} {z:1288} .absolute {r:8px} .right-mobile-tools
+              [ripple-button-v1 {mb:1rem} .justify-content-end .d-flex .no-tap
+                [button slot="button" class="clickable" data-callback="toggle-awake" {p:0.8rem}
+                  [i .material "local_cafe" {fs:1.6rem}]
+                ]
+              ]
+              [ripple-button-v1 {mb:1rem} .justify-content-end .d-flex .no-tap
+                [button slot="button" class="location-screen clickable" data-callback="toggle-layer" {p:0.8rem}
+                  [i .material "layers" {fs:1.6rem}]
+                ]
+              ]
+             <ripple-button-v1>
+              <button slot="button" class="clickable" data-callback="toggle-palette">
+                [i .material "navigate_before" {fs:1.7rem}]
+              </button>
+            </ripple-button-v1>
+          ]
+          
+          [ .absolute {z:100} .mobile-tools {r:0;t:0;}
+            [in type="radio" name="mobile-tools" id="mobile-tool-pencil" checked]
+            [l for="mobile-tool-pencil" .clickable data-callback="toggle-draw-tool" .btn-style-1 .isPencil
+              [ .isPencil
+                [i .material "edit"]
+              ]
+              [ .isEraser
+                <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF"><path d="M5.662 23l-5.369-5.365c-.195-.195-.293-.45-.293-.707 0-.256.098-.512.293-.707l14.929-14.928c.195-.194.451-.293.707-.293.255 0 .512.099.707.293l7.071 7.073c.196.195.293.451.293.708 0 .256-.097.511-.293.707l-11.216 11.219h5.514v2h-12.343zm3.657-2l-5.486-5.486-1.419 1.414 4.076 4.072h2.829zm6.605-17.581l-10.677 10.68 5.658 5.659 10.676-10.682-5.657-5.657z"/></svg>
+                <!--https://iconmonstr.com/eraser-2-svg/-->
+              ]
+            ]
+          ]
+          [ {b:70px;l:0} {z:1288} .absolute {p:8px} .no-select .mobile-left-tools
+            [ripple-button-v1 {mb:1rem} .d-block
+              [button slot="button" class="location-screen clickable" data-callback="toggle-pan-tool" {p:0.8rem}
+                [i .material "pan_tool" {fs:1.6rem}]
+              ]
+            ]
+            <ripple-button-v1>
+              <button slot="button" class="clickable" data-callback="pick-color">
+                [i .material "colorize" {fs:1.7rem}]
+              </button>
+            </ripple-button-v1>
+          ]
+          [ {t:5px;l:60px;r:120px} {z:1288} .absolute {p:8px} .mobile-screen-tools
+            [in type="range" oninput="tes(this)" value="6" min="0" max="11" .no-select {w:100%}]
+            <script>
+              function tes(self) {
+                let scaleIndex = parseInt(self.value);
+                let targetScale = scaleValues[scaleIndex];
+                let isCenterCanvas = true
+                app.drawing.zoom(targetScale, isCenterCanvas);
+                scale = targetScale;
+                app.drawing.redraw();
+              }
+            </script>
+          ]
+          [ .absolute .mobile-screen-tools {
+              top: 115px;
+          left: -60px;
+          /* right: 120px; */
+          z-index: 1288;
+          padding: 8px;
+          width: 10px;}
+            [in type="range" oninput="tes2(this)" value="1" min="1" max="10" .no-select {    transform: rotate(
+      -90deg
+      );
+          width: 160px;}]
+            <script>
+              function tes2(self) {
+                event.preventDefault()
+                // let scaleIndex = parseInt(self.value);
+                // let targetScale = scaleValues[scaleIndex];
+                // let isCenterCanvas = true
+                // app.drawing.zoom(targetScale, isCenterCanvas);
+                // scale = targetScale;
+                // app.drawing.redraw();
+                app.drawing.tools.changeLineWidth(parseInt(self.value))
+              }
+            </script>
+          ]
+          
+          [ {t:0;} {z:1288} .absolute {l:0} .mobile-screen-tools
+            <pop-menu-v1 tabindex="0" style="user-select:none">
+              <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="dodgerblue"><path d="M0 0h24v24H0z" fill="none"></path><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+              <div class="menu ov-hidden" slot="items">
+                <div class="option-menu clickable" data-callback="delete-frame">
+                  [i .material "delete"]
+                  <span>Delete frame</span>
+                </div>
+                <div class="option-menu clickable" data-callback="open-project">
+                  [i .material "upload_file"]
+                  <span>Open project</span>
+                </div>
+                <div class="option-menu clickable" data-callback="export-project">
+                  <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="24px" fill="black"><g><rect fill="none" height="24" width="24"/></g><g><path d="M5,20h14v-2H5V20z M19,9h-4V3H9v6H5l7,7L19,9z"/></g></svg>
+                  <span>Download</span>
+                </div>
+                <div class="option-menu clickable" data-callback="resize-canvas">
+                  [i .material "aspect_ratio"]
+                  <span>Resize Canvas</span>
+                </div>
+              </div>
+            </pop-menu-v1>
+          ]
+          [ {t:50px;} {z:1288} .absolute {r:0} .mobile-screen-tools
+            <pop-menu-v1 tabindex="0" style="user-select:none" position="right">
+              <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="dodgerblue"><path d="M0 0h24v24H0z" fill="none"></path><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+              <div class="menu ov-hidden" slot="items">
+                <div class="option-menu clickable" data-callback="tool-line">
+                  [i .material "minimize"]
+                  <span>Line</span>
+                </div>
+                <div class="option-menu clickable" data-callback="tool-fill">
+                  [i .material "format_color_fill"]
+                  <span>Fill</span>
+                </div>
+                <div class="option-menu clickable" data-callback="tool-selection">
+                  [i .material "highlight_alt"]
+                  <span>Selection</span>
+                </div>
+              </div>
+            </pop-menu-v1>
+          ]
+          
+          <!--[s {pos:absolute;b:0;l:0} "48x48px" {ff:monospace} {op:0.6;p:6px} {col:white} .d-none]-->
+          
+          <style>
+            .version:not(:hover){
+              animation: hide-version 250ms linear forwards ;
+              animation-delay: 3.5s;
+            }
+            @keyframes hide-version {
+            	from {
+            		transform: translateY(0px);
+            	}
+            	to {
+            		transform: translateY(100%);
+            	}
+            }
+          </style>
+          
+          [ @limbo {pos:absolute;t:0;l:0;} {d:grid;} {transform: scale(5);transform-origin: 0 0;}]
+        ]
+        <style>
+          .mini-window[timeline] .gutter {
+            background: none;
+          }
+          .mini-window[timeline] .gutter:hover {
+            background: #262626;
+          }
+        </style>
+        <!-- timeline -->
+        [ {bg:#080808} .mini-window timeline .hide .ov-hidden
+          [ {col:white} .gutter {h:8px} {cursor:row-resize} .no-select ]
+          [ .d-flex {gap:4px} .timeline-action
+            [ .p-2 .d-flex {gap:4px}
+              [ripple-button-v1 .style2 .no-tap
+                [button slot="button" class="clickable" data-callback="new-layer" title="New Layer"
+                  [s .material "add"]
+                ]
+              ]
+              [ripple-button-v1 .style2 .no-tap
+                [button slot="button" .clickable data-callback="rename-layer" title="Rename Layer" .btn-layer .btn-layer-rename
+                  [s .material "edit"]
+                ]
+              ]
+              [ripple-button-v1 .style2 .no-tap d-none
+                [button slot="button" .clickable data-callback="timeline.delete-layer" title="Delete Layer" .btn-layer .btn-layer-delete
+                  [s .material "delete"]
+                ]
+              ]
+              [ripple-button-v1 .style2 .no-tap
+                [button slot="button" .clickable data-callback="timeline.move-down" title="Move Layer Down" .btn-layer .btn-layer-down
+                  [s .material "arrow_downward"]
+                ]
+              ]
+              [ripple-button-v1 .style2 .no-tap
+                [button slot="button" .clickable data-callback="timeline.move-up" title="Move Layer Up" .btn-layer .btn-layer-up
+                  [s .material "arrow_upward"]
+                ]
+              ]
+              [ripple-button-v1 .style2 .no-tap
+                [button slot="button" .clickable data-callback="timeline.duplicate-layer" title="Duplicate Layer"
+                  [s .material "copy"]
+                ]
+              ]
+              [ripple-button-v1 .style2 .no-tap
+                [button slot="button" .clickable data-callback="timeline.merge-layer" title="Merge down layer"
+                  [s .material "sim_card_download"]
+                ]
+              ]
+      
+              [ {w:30px}]
+                
+              [ .d-flex .align-items-center
+                [small "(Beta)" .beta {col:white} {fs:.7rem}]
+              ]
+              
+              [ripple-button-v1 .style2 .no-tap .d-grid
+                [button slot="button" class="clickable" data-callback="timeline.edit-frame-length"} {p:0 .7rem}
+                  [s "Edit Frame Length"]
+                ]
+              ]
+              
+              [ripple-button-v1 .style2 .no-tap .d-grid
+                [button slot="button" class="clickable" data-callback="window.preview"} {p:0 .7rem}
+                  [s "Animation Preview" .mr-1] [small .material "web_asset"]
+                ]
+              ]
+            ]
+            [  .d-grid {cols:1fr auto} {bg:#464646} {ml:auto} .align-items-center
+              [s "Timeline"  .p-2 {fs:.8rem} {col:white}]
+              [button {p:0.5rem} .clickable data-callback="toggle-layers" {bg:none}  {col:white} {bor:0} .pointer .align-items-center .d-flex
+                [i .material "close" {fs:1rem}]
+              ]
+            ]
+          ]
+          <!--TIMELINE-->
+          [ .timeline-wrapper
+            [ @timeline .no-select]
+            [ .mask]
+          ]
+          <!-- status bar -->
+          <style>
+            .txt-status div {border-right: 1px solid #3c3c3c;padding: 0 10px;display:inline-block;    align-items: center; display: inline-flex; gap: 6px;}
+            .txt-status div:last-child {border-right:0}
+            .txt-status .material {font-size:12px;height:12px;width:12px}
+          </style>
+          [ {fs:12px} {col:#c9c9c9} {p:4px 8px} {d:flex} .justify-content-between
+            [ .txt-status .d-flex
+              [ {pl:0}
+                [i .material "layers"]
+                [s ._layer "-"]
+              ]
+              [
+                [i .material "directions_run"]
+                Frame : [s ._frame  "1"]
+              ]
+              [
+                [s ._tool  "Pencil"]
+              ]
+            ]
+          ]
+          
+        ]
+      ]
+      
+    ]
+  ]
+  
+  [ .limbo .General {h:0;ov:hidden}
+    [in type="file" .uploadable data-callback="open-project"]
+  ]
+  
+  <file src="html/template.html"></file>
+  
+  <centered-lightbox-v2 class="lightbox" data-name="animation">
+    <div class="modal" slot="content">
+      <div class="toggler-wrapper">
+        <button class="toggler">×</button>
+      </div>
+      
+    </div>
+  </centered-lightbox-v2>
+  
+  <centered-lightbox-v2 class="lightbox" data-name="layers">
+    <div class="modal" slot="content">
+      [ .h-100 .d-grid
+        [ .ov-auto
+          <div class="toggler-wrapper">
+            <button class="toggler">×</button>
+          </div>
+          [ .d-grid {cols:1fr auto} {gap:1rem} .mb-2 .align-items-center
+            [ripple-button-v1 .style2 .no-tap
+              [button slot="button" class="clickable" data-callback="new-layer" "New Layer"]
+            ]
+            [small .d-block
+              Frame : [s data-name="label-frame-number" "1"]
+            ]
+          ]
+          [ @layer-list {h:440px} .ov-auto]
+        ]
+      ]
+    </div>
+  </centered-lightbox-v2>
+  
+  <style>
+    .mini-window[preview] .clickable.isPlay .isPause,
+    .mini-window[preview] .clickable.isPause .isPlay
+    {display:none}
+  </style>
+
+  [ .fixed {t:0} {w:0} .debug-canvas-container {z:771231}]
+  
+  <file src="html/modals.html"></file>
+  <file src="html/windows.html"></file>
+  
+  <script> window.L = console.log </script>
+  <script> $I = document.querySelector.bind(document) </script>
+  <script> $ = function(selector, node=document) { return node.querySelectorAll(selector) } </script>
+  <script src="js/core/component-loader.js"></script>
+  <script src="index.js"></script>
+  <script src="pwa-cacher.js"></script>
+  
+</body>
+</html>

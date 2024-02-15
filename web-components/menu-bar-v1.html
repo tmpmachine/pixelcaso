@@ -1,0 +1,131 @@
+<template id="menu-bar-v1">
+  <style>
+    :host{display:block}
+  </style>
+  
+  [ @tes]
+  [slot name="menu"]
+  
+  <template id="tmp-keyboard-shortcut" class="Export">
+    <small></small>
+  </template>
+</template>
+
+<script>
+  (function() {
+    let $ = (selector, node = document) => node.querySelectorAll(selector);
+    let version = 1;
+    let templateId = `menu-bar-v${version}`;
+    class CustomElement extends HTMLElement {
+      constructor() {
+        super();
+         /* production-script
+        let template = document.createElement('template');
+        template.setAttribute('id', templateId);
+        template.innerHTML = "@replaceWithTemplateHTML@";
+        document.querySelector('html').append(template);
+        // */
+        let content = $(`template#${templateId}`)[0].content.cloneNode(true);
+        this.attachShadow({mode: 'open'}).append(content);
+        $('slot', this.shadowRoot)[0].addEventListener('slotchange', this.updateContent.bind(this));
+      }
+      
+      updateContent(evt) {
+        let slotItem = evt.target.assignedNodes()[0];
+        window.setTimeout(() => {
+          this.initNavMenus($('.item', slotItem));
+          this.attachNavbarListener(slotItem);
+        }, 1);
+      }
+      
+      connectedCallback() {
+        
+      }
+      
+      attachNavbarListener(slotItem) {
+        slotItem.addEventListener('mouseover', this.hoverHandler);
+        slotItem.addEventListener('click', this.clickHandler);
+      }
+      
+      hoverHandler(e) {
+        if (document.activeElement.classList.contains('isRoot') || document.activeElement.classList.contains('item')) {
+          if (e.target != document.activeElement && e.target.classList.contains('isRoot')) {
+            e.target.focus();
+          }
+        }
+      }
+      
+      clickHandler(e) {
+        if (!e.target.classList.contains('isRoot')) {
+          document.activeElement.blur();
+        }
+      }  
+      
+      initNavMenus(menuItems) {
+        let template = $('#tmp-keyboard-shortcut', this.shadowRoot)[0]
+        for (let menu of menuItems) {
+          if (menu.dataset.shortcut) {
+            let shortcut = template.content.cloneNode(true);
+            $('small', shortcut)[0].textContent = menu.dataset.shortcut;
+            menu.append(shortcut);
+          }
+        }
+      }
+    }
+    customElements.define(templateId, CustomElement);
+  })();
+</script>
+
+<style>
+  /* menu-bar-v1 main style*/
+  menu-bar-v1 .drop-menu .submenu{display:none;position:absolute}
+  menu-bar-v1 .drop-menu:focus .submenu, menu-bar-v1 .drop-menu > .isRoot:focus ~ .submenu, menu-bar-v1 .drop-menu > .isRoot:active ~ .submenu, menu-bar-v1 .drop-menu .submenu:active, menu-bar-v1 .drop-menu:focus-within .submenu{display:block}
+  /* menu-bar-v1 skin style*/
+  .menu-bar {
+    background: #191a21;
+    display: flex;
+  }
+  .menu-bar .isRoot {
+    background: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border: 0;
+    font-size: 12px;
+  }
+  .menu-bar .isRoot:hover, .menu-bar .item:hover {
+    background: #464a52;
+  }
+  .menu-bar .drop-menu {
+    height: 32px;
+    position: relative;
+  }
+  .menu-bar .drop-menu small {
+    opacity: .6;
+  }
+  .menu-bar .submenu {
+    top: 32px;
+    width: 200px;
+    background: #1f2029;
+    box-shadow: 0 1px 3px 0px #00000059;
+  }
+  .menu-bar .item {
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    background: none;
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    width: 100%;
+    font-size: 12px;
+  }
+  .menu-bar .drop-menu {
+    display: flex;
+  }
+  .menu-bar hr {
+    margin: 0;
+    opacity: 0.3;
+  }
+</style>

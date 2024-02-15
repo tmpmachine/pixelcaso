@@ -1,0 +1,62 @@
+{
+  "etc": [
+    "js/components/toolbar-component.js",
+    "css/style.css",
+    "css/widgets.css",
+    "index.js",
+    
+    "js/ui-mobile.js",
+    "js/utility.js",
+    "js/ui.js",
+    "js/event-listeners.js",
+    "js/dom-events.js",
+    "js/components/filesave.js",
+    
+    "js/components/app-file-reader.js",
+    "js/core/component-loader.js",
+    "js/core/lib/aww.js",
+    "js/core/lib/CCapture.all.min.js",
+    "js/core/lib/keyboard.js",
+    "js/core/lib/lsdb.js",
+    
+    "js/app.js",
+    "js/components/animator.js",
+    "js/components/clipboard.js",
+    "js/components/drawing.js",
+    "js/components/frame.js",
+    "js/components/layer.js",
+    "js/components/projectManager.js",
+    "js/components/state-manager.js",
+    "js/components/timeline.js",
+    "js/components/tools.js",
+    "js/components/undoManager.js",
+    "js/components/pinch-zoom.js",
+    
+    "js/components/tools/eraser.js",
+    "js/components/tools/fill.js",
+    "js/components/tools/hand.js",
+    "js/components/tools/line.js",
+    "js/components/tools/move.js",
+    "js/components/tools/pencil.js",
+    "js/components/tools/picker.js",
+    "js/components/tools/rotate.js",
+    "js/components/tools/select.js",
+    "js/components/tools/wand.js",
+    "js/components/tools/shapes/rectangle.js",
+    "js/components/tools/shapes/ellipse.js"
+  ],
+  "libs": [
+    "js/lib/jszip.min.js"
+  ],
+  "fonts": [
+    "https://fonts.gstatic.com/s/materialiconsround/v107/LDItaoyNOAY6Uewc665JcIzCKsKc_M9flwmP.woff2" 
+  ],
+  "root": [
+    "./",
+    "index.html",
+    "manifest.json",
+    
+    "pwa-cache.js",
+    "pwa.js"
+  ]
+}

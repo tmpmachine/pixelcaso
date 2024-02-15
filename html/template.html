@@ -1,0 +1,67 @@
+<template frame>
+  [ .frame]
+</template>
+<template layer>
+  [ .layer data-layer-id="" .clickable data-callback="timeline.layer-action"
+    [ .layer-name 
+      [s .name .mr-auto]
+      [s .material "visibility" .icon title="Toggle Layer Visibility" .toggle-visibility]
+      [s .material "settings" .icon title="Layer Settings" .btn-settings]
+      <!--[s .material "lock" .icon title="Toggle Lock Layer" .toggle-lock]-->
+    ]
+    [ .frames .d-flex]
+  ]
+</template>
+<template layer-mobile>
+  [ .layer data-layer-id="" .clickable data-callback="mobile.layer.focus"
+    [ .layer-name 
+      [s .name .mr-auto]
+      [s .material "visibility" .icon title="Toggle Layer Visibility" .toggle-visibility {d:none}]
+      [s .material "settings" .icon title="Layer Settings" .btn-settings {d:none}]
+      <!--[s .material "lock" .icon title="Toggle Lock Layer" .toggle-lock]-->
+    ]
+    [ .frames .d-flex]
+  ]
+</template>
+<template id="tmp-layer">
+  [ .layers .d-grid {gap:4px}
+    [ data-name="title" "Untitled Layer" {fs:14px}]
+    [ {d:grid;cols:1fr auto}
+      [can width="50" height="60"]
+      [ .d-flex .action {gap:10px}
+      
+        [ripple-button-v1 {mb:1rem} .d-block .clickable data-callback="layer-up"
+          [button slot="button"  {p:0.3rem}
+            [i .material "arrow_upward" {fs:1.6rem}]
+          ]
+        ]
+        [ripple-button-v1 {mb:1rem} .d-block .clickable data-callback="layer-down"
+          [button slot="button"  {p:0.3rem}
+            [i .material "arrow_downward" {fs:1.6rem}]
+          ]
+        ]
+      
+        <pop-menu-v1 tabindex="0" style="user-select:none" position="right">
+          <svg slot="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="dodgerblue"><path d="M0 0h24v24H0z" fill="none"></path><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+          <div class="menu ov-hidden" slot="items">
+            <div class="option-menu clickable" data-callback="rename">
+              [i .material "edit"]
+              <span>Rename Layer</span>
+            </div>
+            <div class="option-menu clickable" data-callback="hide">
+              [i .material "visibility"]
+              <span>Toggle Visibility</span>
+            </div>
+            <div class="option-menu clickable" data-callback="delete">
+              [i .material "delete"]
+              <span>Delete Layer</span>
+            </div>
+          </div>
+        </pop-menu-v1>
+      ]
+    ]
+  ]
+</template>
+<template id="tmp-keyboard-shortcut">
+  <span class="shortcuts w3-tiny w3-opacity w3-right"></span>
+</template>

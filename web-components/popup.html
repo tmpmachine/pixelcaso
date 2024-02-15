@@ -1,0 +1,103 @@
+<template id="pop-menu-element-v1">
+  
+  <style>
+    :host{-webkit-tap-highlight-color:rgba(0,0,0,0.1)}
+    :host{padding:8px}
+    :host(:hover),.btn.li {cursor:pointer}
+    :host(:hover) .li * {color:#3bff99}
+    :host{position: relative;display:inline-block;outline-color: #e91e63}
+    :host .uid-A{display: none}
+    :host(:active) .uid-A{display: block}
+    :host(:focus) .uid-A{display: block}
+    #checker{display:none}
+    #checker:not(:checked) ~ .uid-A{display:none!important}
+    .uid-A > div {
+      box-shadow: 0px 1px 2px 2px #1d1d1dd1;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .uid-A {
+      position: absolute;
+      top: 45px;
+      /*background: white;*/
+      color: black;
+      width: 210px;
+      z-index: 1;
+    }
+    .uid-A.left {
+      left: 0;
+    }
+    .uid-A.right {
+      right: 0;
+    }
+    slot {
+      display: block;
+    }
+  </style>
+  
+    <label class="btn li" for="checker">
+      <slot name="icon" style="display:block;">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"></path><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+      </slot>
+    </label>
+    [in type="checkbox" @checker]
+    <div class="uid-A left">
+      <slot name="items"></slot>
+    </div>
+  
+</template>
+
+<script> L = console.log </script>
+<script>
+  (function() {
+    let $ = (selector, node = document) => node.querySelectorAll(selector);
+    let version = 1;
+    class CustomElement extends HTMLElement {
+      constructor() {
+        super();
+        let templateId = `pop-menu-element-v${version}`;
+        let content = $(`#${templateId}`)[0].content.cloneNode(true);
+        this.attachShadow({mode: 'open'}).append(content)
+      }
+      connectedCallback() {
+        this.addEventListener('blur', () => {
+          $('#checker', this.shadowRoot)[0].checked = false;
+        });
+        this.addEventListener('click', () => {
+          let isChecked = $('#checker', this.shadowRoot)[0].checked;
+          $('#checker', this.shadowRoot)[0].checked = !isChecked;
+        });
+        if (this.hasAttribute('position') && this.getAttribute('position') == 'right') {
+          $('.uid-A', this.shadowRoot)[0].classList.toggle('left', false);
+          $('.uid-A', this.shadowRoot)[0].classList.toggle('right', true);
+        }
+      }
+    }
+    customElements.define(`pop-menu-v${version}`, CustomElement);
+  })();
+</script>
+
+<style>
+  /* option menu styling is handled outside custom element */
+  .menu {
+      border: 1px solid;
+      border-radius: 5px;
+      background: white;
+  }
+  .option-menu {
+    display: grid;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px;
+    grid-template-columns: auto 1fr;
+    flex-grow: 1 1;
+    font-family: sans-serif;
+  }
+  .option-menu:hover {
+      background: #e8e8e8;
+  }
+  .option-menu span {
+      padding: 4px;
+  }
+</style>

@@ -1,0 +1,87 @@
+<template id="ripple-button-v1">
+  <style>
+    button, ::slotted(button) {
+        overflow: hidden;
+        position: relative;
+    }
+  </style>
+  <slot name="button"></slot>
+</template>
+
+<script>
+  (function() {
+    let $ = (selector, node = document) => node.querySelectorAll(selector);
+    let version = 1;
+    let templateId = `ripple-button-v${version}`;
+    class CustomElement extends HTMLElement {
+      constructor() {
+        super();
+         /* production-script
+        let template = document.createElement('template');
+        template.setAttribute('id', templateId);
+        template.innerHTML = "@replaceWithTemplateHTML@";
+        document.querySelector('html').append(template);
+        // */
+        let content = $(`template#${templateId}`)[0].content.cloneNode(true);
+        this.attachShadow({mode: 'open'}).append(content);
+        $('slot', this.shadowRoot)[0].addEventListener('slotchange', this.updateContent.bind(this));
+      }
+      
+      getSlotData(evt) {
+        return evt.target.assignedNodes()[0];
+      }
+      
+      updateContent(evt) {
+        let contentDOM = this.getSlotData(evt)
+        contentDOM.addEventListener('click', this.createRipple);
+      }
+    
+      createRipple(e) {
+        let circle = document.createElement('div');
+        this.appendChild(circle);
+        circle.classList.add('ripple');
+        window.setTimeout(() => {
+          circle.remove();
+        }, 600);
+      }
+    }
+    customElements.define(templateId, CustomElement);
+  })();
+</script>
+
+<style>
+  ripple-button-v1 button {
+    border: 0;
+    background: #323333;
+    color: white;
+    padding: 1.2rem;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 50%;
+    -webkit-user-select: none;
+    width: auto;
+    /* height: 2rem; */
+    box-sizing: border-box;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+  }
+  ripple-button-v1 button:hover {
+      background: #404142;
+  }
+  ripple-button-v1 button  .ripple{
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.7);
+      position: absolute;
+      transform: scale(0);
+      padding: 20px;
+      animation: ripple 300ms linear;
+  }
+  @keyframes ripple {
+    to {
+      transform: scale(2.5);
+      opacity: 0;
+    }
+  }
+</style>

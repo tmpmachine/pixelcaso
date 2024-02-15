@@ -1,0 +1,186 @@
+[ @dropZone {bor:1px solid} {w:200px;h:200px}]
+
+
+<script> window.asd = console.log </script>
+<script>
+  
+  initDragDropZone();
+
+  let activeDropZone;
+	let isPressedCtrlKey = false;
+	let isDragging = false;
+	let isSupportSaveFile = ('showSaveFilePicker' in window) ? true : false;
+	let dropTarget = '';
+	let readQueue = [];
+	const handlerType = {
+		'notSet': -1,
+		'default': 0, // all browsers, file only
+		'webkitGetAsEntry': 1, // firefox, supports directory
+		'getAsFileSystemHandle': 2, // chrome, supports directory
+		defaultType: -1,
+	};
+	
+	function getFileRef(entry) {
+		return new Promise(resolve => {
+			if (HANDLER_TYPE == 1)
+				entry.file(resolve);
+			else if (HANDLER_TYPE == 2)
+				entry.getFile().then(resolve);
+		});
+	}
+
+	Object.defineProperty(window, 'HANDLER_TYPE', {
+		get: () => {
+			return handlerType.defaultType;
+		},
+		set: type => {
+			if (handlerType[type] === undefined)
+				console.log('HANDLER_TYPE not defined');
+			else
+				handlerType.defaultType = handlerType[type];
+		}
+	});
+
+  function getHandler() {
+		let handler = getAsDropItems;
+		switch (HANDLER_TYPE) {
+	  		case 1: handler = getAsEntry; break;
+	  		case 2: handler = getAsFileSystemHandle; break;
+	  	}
+	  	return handler;
+	}
+
+  function preventDefault(e) {
+    	e.preventDefault();
+    }
+	
+	function initDragDropZone(target, dragZone) {
+		dropZone.addEventListener('drop', preventDefault);
+		dropZone.addEventListener('dragover', preventDefault);
+		// dragZone.addEventListener('dragover', preventDefault);
+
+		dropZone.addEventListener('drop', e => {
+			handleEditorDrop(e, target);
+		});
+	}
+	
+	function handleEditorDrop(e, target, isPressedCtrlKey) {
+		readTransferItems(e.dataTransfer.items, target, isPressedCtrlKey);
+	}
+	
+	function setSupportedFileHandler(items) {
+		return new Promise(resolve => {
+		  if (HANDLER_TYPE === -1) {
+		  	checkFileSystemHandleSupport(items[0])
+		  	.then(resolve)
+		  	.catch(() => {
+			  	checkGetAsEntrySupport(items[0])
+			  	.then(resolve)
+			  	.catch(resolve);
+		  	});
+		  } else {
+		  	resolve();
+		  }
+		});
+	}
+	
+	function checkGetAsEntrySupport(item) {
+		return new Promise((resolve, reject) => {
+
+			function resolver() {
+		 		resolve('webkitGetAsEntry');
+			}
+
+			function errorHandler() {
+	    		reject('default');
+			}
+
+			if ('webkitGetAsEntry' in item) {
+				entry = item.webkitGetAsEntry();
+				if (entry.isDirectory) {
+				    let directoryReader = entry.createReader();
+					directoryReader.readEntries(resolver, errorHandler);
+			 	} else {
+			 		entry.file(resolver, errorHandler);
+				}
+			} else {
+				errorHandler();
+			}
+		});
+	}
+	
+	function checkFileSystemHandleSupport(item) {
+		return new Promise(resolve => {
+			if ('getAsFileSystemHandle' in item) {
+				resolve('getAsFileSystemHandle');
+			} else {
+				reject('default');
+			}
+		});
+	}
+	
+	function readTransferItems(items, dropTarget, isPressedCtrlKey) {
+		if (items[0].kind != 'file')
+			return;
+
+	  	setSupportedFileHandler(items).then(type => {
+	  		if (type !== undefined)
+				HANDLER_TYPE = type;
+		// 	let parentId = activeFolder;
+		// 	let callback = (dropTarget == 'editor') ? openOnEditor : saveToStorage;
+			let handler = getHandler();
+			let queue;
+
+  		handler(items, openOnEditor, null, queue, null);
+  		
+		});
+	}
+	
+	function getFileContent(item, parentId, queue, isDataTransferItem = true) {
+  	return new Promise(async resolve => {
+  		let entry = item;
+  		if (isDataTransferItem) {
+	  		entry = await item.getAsFileSystemHandle();
+  		}
+			resolve({
+				queue,
+				parentId,
+				entry,
+	 			name: entry.name,
+				type: entry.kind,
+				isPressedCtrlKey: item.isPressedCtrlKey,
+			});	
+  	})
+	}
+	
+	function getAsDropItems() {
+		aww.pop('No supported file handler at the moment');
+	}
+	
+	function getAsFileSystemHandle(items, callback, parentId, queue, isPressedCtrlKey) {
+		for (let item of items) {
+			if (item.kind == 'file') {
+				item.isPressedCtrlKey = isPressedCtrlKey;
+		  		getFileContent(item, parentId, queue).then(callback);
+		  	}
+		}
+	}
+	
+	async function openOnEditor(data) {
+		// if (isDir(data.type))
+		// 	return;
+		asd(data)
+			
+		let fileRef = await getFileRef(data.entry);
+		let content = await fileRef.text();
+		let tabData = {
+			content,
+			fid: '-' + (new Date).getTime(),
+			name: data.name,
+		// 	editor: initEditor(content),
+			fileHandle: data.entry,
+		};
+		// newTab(-1, tabData);
+	}
+	
+</script>

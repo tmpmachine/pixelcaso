@@ -1,0 +1,173 @@
+<modal-v2 class="modal-component" data-name="export-image">
+  <div class="modal d-grid ov-hidden" slot="content">
+    [ .d-flex .justify-content-between .modal-default-padding {bg:gainsboro}
+      <h5><b>Export as Image</b></h5>
+      <button class="toggler-icon toggler">×</button>
+    ]
+    [ .ov-auto .modal-default-padding
+      <form class="submittable" data-callback="export-image" name="export-image">
+        <label>File name [in name="fileName" .w3-input .mb-4]</label>
+        <label>Width (px) [in name="width" .inputable .w3-input type="number" .mb-4]</label>  
+        <label>Height (px) [in name="height" .inputable .w3-input type="number" .mb-2]</label> 
+        <label>
+          <input name="isMaintainAspectRatio" class="w3-check" checked type="checkbox"/> Maintain Aspect Ratio
+        </label>
+        [ .mb-4]
+        [ .mobile-hide
+          Export type :
+          [sel name="frame" .w3-input
+            [opt value="single-frame" "Current frame"]
+            [opt value="spritesheet" "Spritesheet"]
+          ]
+          [ {d:none}
+            <label>
+              <input name="isExportSelectedLayer" class="w3-check" type="checkbox"/> Export selected layer
+            </label>
+          ]
+          [l .d-block {mt:1rem}
+            <input name="isReverseAnimation" class="w3-check" type="checkbox"/> Reverse animation
+          ]
+          [l .d-block {mt:1rem}
+            <input name="isExportLayers" class="w3-check" type="checkbox"/> Export separate layers
+          ]
+        ]
+        [hr]
+        [ {ta:right}
+          <button class="btn-style-1" style="width:auto">Export</button>
+        ]
+      </form>
+    ]
+  </div>
+</modal-v2>
+
+
+<modal-v2 class="modal-component" data-name="recent-projects">
+  <div class="modal d-grid ov-hidden" slot="content">
+    [ .d-flex .justify-content-between .modal-default-padding {bg:gainsboro}
+      <h5><b>Recent Projects</b></h5>
+      <button class="toggler-icon toggler">×</button>
+    ]
+    [ .ov-auto .modal-default-padding
+      [ .js-project-list .clickable data-callback='modals.recent-projects-click-handler']
+    ]
+  </div>
+</modal-v2>
+
+
+<modal-v2 class="modal-component" data-name="export-video">
+  <div class="modal d-grid ov-hidden" slot="content">
+    [ .d-flex .justify-content-between .modal-default-padding {bg:gainsboro}
+      <h5><b>Export as Video</b></h5>
+      <button class="toggler-icon toggler">×</button>
+    ]
+    [ .ov-auto .modal-default-padding
+      <form class="submittable" data-callback="export-video" name="export-video">
+        [p
+          <label>File name (.webm) [in name="fileName" .w3-input disabled value="(auto generated)"]</label>
+        ]
+        [h6 "Resolution"]
+        [p
+          <label>Width (px) [in name="width" .inputable .w3-input type="number"]</label>  
+        ]
+        [p
+         <label>Height (px) [in name="height" .inputable .w3-input type="number"]</label> 
+        ]
+	      [p
+	        <label><input name="isMaintainAspectRatio" class="w3-check" checked type="checkbox"/> Maintain Aspect Ratio</label>
+	      ]
+        [h6 "Duration"]
+        [p
+         <label>FPS [in name="fps" .inputable .w3-input value="12" min="1" type="number"]</label> 
+        ]
+        [p
+         <label>Animation Loop Count[in name="loop" .inputable .w3-input value="1" min="1" type="number"]</label> 
+        ]
+        Export progress : <progress value="0" max="100"></progress>
+        [hr]
+        [ {ta:right}
+          <button class="btn-style-1" style="width:auto">Export</button>
+        ]
+      </form>
+    ]
+  </div>
+</modal-v2>
+
+
+<modal-v2 class="modal-component" data-name="frame-length">
+  <div class="modal" slot="content">
+    [ .d-flex .justify-content-between .modal-default-padding
+      <h5><b>Frame Length [small .beta "Beta"]</b></h5>
+      <button class="toggler-icon toggler">×</button>
+    ]
+    [ .modal-default-padding
+      <form class="submittable" data-callback="change-frame-length">
+        [in autofocus name="frameLength" .inputable .w3-input value="1" min="1" type="number" .mb-4]
+        [ {ta:right}
+          <button class="btn-style-1" style="width:auto">OK</button>
+        ]
+      </form>
+    ]
+  </div>
+</modal-v2>
+
+<modal-v2 class="modal-component" data-name="resize-canvas">
+  <div class="modal" slot="content">
+    [ .d-flex .justify-content-between .modal-default-padding
+      <h5><b>Resize Canvas</b></h5>
+      <button class="toggler-icon toggler">×</button>
+    ]
+    [ .modal-default-padding
+      <form class="submittable" data-callback="resize-canvas">
+        [p
+          <label>Width (px) [in autofocus name="width" min="1" .w3-input type="number"]</label>  
+        ]
+        [p
+         <label>Height (px) [in name="height" min="1" .w3-input type="number"]</label> 
+        ]
+        [ {ta:right}
+          <button class="btn-style-1" style="width:auto">OK</button>
+        ]
+      </form>
+    ]
+  </div>
+</modal-v2>
+
+<modal-v2 class="modal-component" data-name="confirm">
+  <div class="modal" slot="content">
+    [ .d-flex .justify-content-between .modal-default-padding
+      <h5><b class="title">Window title</b></h5>
+      <button class="toggler-icon toggler">×</button>
+    ]
+    [ .modal-default-padding
+      <form>
+        [p "Confirmation message goes here"]
+        [ {ta:right}
+          <button type="button" autofocus class="toggler cancel-btn btn-style-1" style="width:auto">Cancel</button>
+          <button class="btn-style-1" style="width:auto">OK</button>
+        ]
+      </form>
+    ]
+  </div>
+</modal-v2>
+
+<modal-v2 class="modal-component" data-name="prompt">
+  <div class="modal" slot="content">
+    [ .d-flex .justify-content-between .modal-default-padding
+      <h5><b class="title">Window title</b></h5>
+      <button class="toggler-icon toggler">×</button>
+    ]
+    [ .modal-default-padding
+      <form>
+        [p
+          [l .d-grid {gap:8px}
+            <span class="label">Width (px)</span> [in autofocus .w3-input]
+          ]
+        ]
+        [ {ta:right}
+          <button type="button" autofocus class="toggler btn-style-1" style="width:auto">Cancel</button>
+          <button class="btn-style-1" style="width:auto">OK</button>
+        ]
+      </form>
+    ]
+  </div>
+</modal-v2>

@@ -1,0 +1,18 @@
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyDK9A1khABymvU_8hUN10DNYSh4fY0rFiA",
+    authDomain: "pixelcaso.firebaseapp.com",
+    databaseURL: "https://pixelcaso.firebaseio.com",
+    projectId: "pixelcaso",
+    storageBucket: "pixelcaso.appspot.com",
+    messagingSenderId: "277029426073",
+    appId: "1:277029426073:web:b9d2f144c1eaace166b908",
+    measurementId: "G-2VV255P1X4"
+  };
+  const app = initializeApp(firebaseConfig);
+  if (window.location.origin == 'https://pixelcaso.web.app') {
+    const analytics = getAnalytics(app);
+  }
+</script>
