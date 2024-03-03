@@ -528,3 +528,5 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .w3-input{padding:8px;display:block;border:none;border-bottom:1px solid #ccc;width:100%}
 .w3-check,.w3-radio{width:24px;height:24px;position:relative;top:6px}
 html{box-sizing:border-box}*,*:before,*:after{box-sizing:inherit}
+
+.obsoletes{display:none!important;height:0!important;width:0!important;overflow:hidden!important;visibility:hidden!important;position:absolute!important}

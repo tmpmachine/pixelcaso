@@ -74,21 +74,6 @@
             ]          
           ]
           
-          <!--
-          [p {lh:1.5rem}
-            Start drawing by clicking the pencil button below or open a project file.
-          ]
-          -->
-          
-          <h2>What's new?</h2>
-          <!--
-          [ul
-            [li
-              [a href="https://pixelcaso.blogspot.com/2022/01/pixelcaso-v2194-changelog.html" "Pixelcaso v2.19.4 Changelog" {col:white}]
-            ]
-          ]
-          -->
-          
           <style>
             .app-updates-container > div {
               display: inline-flex;
@@ -101,9 +86,12 @@
             }
           </style>
           
-          <div class="app-updates-container">
-            Loading news ...
-          </div>
+          <h2>Welcome</h2>
+          [ .obsoletes
+            <div class="app-updates-container">
+              Loading news ...
+            </div>
+          ]
           
           <!-- mobile project list -->
           [ {d:grid} {cols:1fr 1fr} {gap:24px} {mt:2rem} {mb:3rem} .file-save-container {ov:auto} {h:300px} .clickable data-callback='modals.recent-projects-click-handler']
@@ -231,9 +219,7 @@
             ]
           ]
           [ {p:1rem} {d:flex} {justify-content:center} {mt:1rem} .footer-links
-            [a href="https://www.instagram.com/pixelcaso/" "Instagram"] 
-            [a href="https://www.youtube.com/channel/UCnKC_0t5WsFwtc7n6RXsEXg" "YouTube"]
-            [a href="https://tmpmachine7.itch.io/pixelcaso" "Itch.io"]
+            [a href="https://pacolemon.blogspot.com/p/pixelcaso-privacy-policy.html" "Privacy Policy"] 
           ]
         ]
       ]
@@ -481,11 +467,7 @@
               <div class="drop-menu">
           	    <div class="isRoot" tabindex="0">About</div>
                 <div class="submenu">
-                  <a class="item" href="https://pixelcaso.blogspot.com/" target="blank" style="text-decoration:none;">Blog</a>
-                  <a class="item" href="https://www.youtube.com/channel/UCnKC_0t5WsFwtc7n6RXsEXg" target="blank" style="text-decoration:none;">YouTube</a>
-                  <a class="item" href="https://www.instagram.com/pixelcaso/" target="blank" style="text-decoration:none;">Instagram</a>
-                  <a class="item" href="https://twitter.com/tmpmachine" target="blank" style="text-decoration:none;">Twitter</a>
-                  <a class="item" href="https://tmpmachine7.itch.io/pixelcaso" target="blank" style="text-decoration:none;">Itch.io</a>
+                  <a class="item" href="https://pacolemon.blogspot.com/p/pixelcaso-privacy-policy.html" target="blank" style="text-decoration:none;">Privacy Policy</a>
                   [hr]
                   [btn .item onclick="pwaCacher.update()" "Check updates"]
                   [btn .item onclick="pwaCacher.removeUpdate()" "Clear app cache"]

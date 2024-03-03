@@ -1,5 +1,6 @@
 {
   "name": "Pixelcaso",
+  "short_name": "Pixelcaso",
   "icons": [{
     "src": "images/128.png",
     "type": "image/png",
@@ -8,6 +9,10 @@
     "src": "images/192.png",
     "type": "image/png",
     "sizes": "192x192"
+  }, {
+    "src": "images/512.png",
+    "type": "image/png",
+    "sizes": "512x512"
   }],
   "start_url": "./",
   "display": "standalone",
@@ -22,7 +27,7 @@
       },
       "icons": [
         {
-          "src": "assets/images/128.png",
+          "src": "images/128.png",
           "sizes": "128x128",
           "type": "image/png"
         }
